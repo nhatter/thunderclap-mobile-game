@@ -29,7 +29,7 @@ public class Flashy : MonoBehaviour {
 	bool isVibrating = false;
 
 	float vibrateTimer = 0;
-	float timeToVibrate = 2.0f;
+	public float timeToVibrate = 1.0f;
 
 	int dodgeCount = 0;
 	int umbrellaCount = 1;
@@ -55,6 +55,18 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		#if UNITY_IOS || UNITY_ANDROID
+		if(isVibrating) {
+			vibrateTimer += Time.deltaTime;
+			Handheld.Vibrate();
+
+			if(vibrateTimer >= timeToVibrate) {
+				vibrateTimer = 0;
+				isVibrating = false;
+			}
+		}
+		#endif
+
 		if(!isFadingIn && !isFlashCaught && !gameOver) {
 			if(flashTimer > timeToFlash) {
 				iTween.CameraFadeTo(iTween.Hash("amount", 1.0f, "time", flashInTime, "oncompletetarget", this.gameObject, "oncomplete", "fadeOutFlash"));
@@ -72,9 +84,9 @@ public class Flashy : MonoBehaviour {
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
 						audio.PlayOneShot(zapSound);
-						#if UNITY_IOS || UNITY_ANDROID
+
 							isVibrating = true;
-						#endif
+
 					}
 
 					isTouchReleased = false;
@@ -133,10 +145,10 @@ public class Flashy : MonoBehaviour {
 	}
 
 	void fadeOutFlash() {
-		iTween.CameraFadeTo(iTween.Hash("amount", 0.0f, "time", flashOutTime, "oncompletetarget", this.gameObject, "oncomplete", "completeFlash"));
+		iTween.CameraFadeTo(iTween.Hash("amount", 0.0f, "time", flashOutTime, "oncompletetarget", this.gameObject, "oncomplete", "initFlash"));
 	}
 
-	void completeFlash() {
+	void initFlash() {
 		isFlashCaught = false;
 		isFadingIn = false;
 		flashTimer = 0;
@@ -157,6 +169,7 @@ public class Flashy : MonoBehaviour {
 				
 					if(GUILayout.Button("RETRY")) {
 						gameOver = false;
+						initFlash();
 					}
 
 					if(GUILayout.Button("BUY UMBRELLAS")) {
