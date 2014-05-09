@@ -152,6 +152,7 @@ public class Flashy : MonoBehaviour {
 		isFlashCaught = false;
 		isFadingIn = false;
 		flashTimer = 0;
+		savedByUmbrella = false;
 		calculateTimeToFlash();
 	}
 
