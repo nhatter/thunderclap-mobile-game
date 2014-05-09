@@ -16,7 +16,7 @@ public class Flashy : MonoBehaviour {
 	public string[] congratulatoryPhrases;
 	string congratulatoryPhrase;
 
-
+	public AudioClip zapSound;
 
 	float flashTimer;
 	float timeToFlash;
@@ -26,6 +26,10 @@ public class Flashy : MonoBehaviour {
 	bool isTouchReleased = true;
 	bool gameOver = false;
 	bool savedByUmbrella = false;
+	bool isVibrating = false;
+
+	float vibrateTimer = 0;
+	float timeToVibrate = 2.0f;
 
 	int dodgeCount = 0;
 	int umbrellaCount = 1;
@@ -34,7 +38,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
-	Rect CENTER_SCREEN = new Rect(Screen.width/4, Screen.height/2, Screen.width/2, 300);
+	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 25, Screen.height/2, Screen.width/2 + 75, 300);
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 75, 0, 100, 100);
 
 	// Use this for initialization
@@ -67,7 +71,10 @@ public class Flashy : MonoBehaviour {
 						dodgeCount = 0;
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
-
+						audio.PlayOneShot(zapSound);
+						#if UNITY_IOS || UNITY_ANDROID
+							isVibrating = true;
+						#endif
 					}
 
 					isTouchReleased = false;
@@ -89,7 +96,7 @@ public class Flashy : MonoBehaviour {
 			}
 
 
-			if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught) {
+			if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught & !gameOver) {
 				if(umbrellaCount > 0) {
 					savedByUmbrella = true;
 					umbrellaCount--;
@@ -100,6 +107,7 @@ public class Flashy : MonoBehaviour {
 					gameOver = true;
 					counterDisplay.text = ""+dodgeCount;
 					Debug.Log("Missed the flash");
+					audio.PlayOneShot(zapSound);
 				}
 			}
 
@@ -145,13 +153,13 @@ public class Flashy : MonoBehaviour {
 
 		if(gameOver) {
 			GUILayout.BeginArea(CENTER_SCREEN);
-				GUILayout.Label("GAME OVER", GUILayout.Width(Screen.width/2));
+				GUILayout.Label("GAME OVER");
 				
-					if(GUILayout.Button("RETRY", GUILayout.Width(Screen.width/2))) {
+					if(GUILayout.Button("RETRY")) {
 						gameOver = false;
 					}
 
-					if(GUILayout.Button("BUY UMBRELLAS", GUILayout.Width(Screen.width/2))) {
+					if(GUILayout.Button("BUY UMBRELLAS")) {
 					}
 				
 			GUILayout.EndArea();
