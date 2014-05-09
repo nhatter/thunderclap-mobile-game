@@ -11,8 +11,12 @@ public class Flashy : MonoBehaviour {
 	public float reactionLeeway = 0.1f;
 
 	public Texture2D flashyIcon;
+	public Texture2D umbrellaIcon;
+
 	public string[] congratulatoryPhrases;
 	string congratulatoryPhrase;
+
+
 
 	float flashTimer;
 	float timeToFlash;
@@ -21,13 +25,17 @@ public class Flashy : MonoBehaviour {
 	bool isFlashCaught = false;
 	bool isTouchReleased = true;
 	bool gameOver = false;
+	bool savedByUmbrella = false;
 
 	int dodgeCount = 0;
+	int umbrellaCount = 1;
+
 
 	GUIContent counterDisplay = new GUIContent();
+	GUIContent umbrellaDisplay = new GUIContent();
 
 	Rect CENTER_SCREEN = new Rect(Screen.width/4, Screen.height/2, Screen.width/2, 300);
-
+	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 75, 0, 100, 100);
 
 	// Use this for initialization
 	void Start () {
@@ -36,6 +44,9 @@ public class Flashy : MonoBehaviour {
 
 		counterDisplay.image = flashyIcon;
 		counterDisplay.text = ""+dodgeCount;
+
+		umbrellaDisplay.image = umbrellaIcon;
+		umbrellaDisplay.text = ""+umbrellaCount;
 	}
 	
 	// Update is called once per frame
@@ -44,12 +55,21 @@ public class Flashy : MonoBehaviour {
 			if(flashTimer > timeToFlash) {
 				iTween.CameraFadeTo(iTween.Hash("amount", 1.0f, "time", flashInTime, "oncompletetarget", this.gameObject, "oncomplete", "fadeOutFlash"));
 				isFadingIn = true;
+				savedByUmbrella = false;
 			} else {
 				if(isTouchReleased && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
-					flashTimer = 0;
-					dodgeCount = 0;
-					gameOver = true;
-					counterDisplay.text = ""+dodgeCount;
+					if(umbrellaCount > 0 && !savedByUmbrella) {
+						savedByUmbrella = true;
+						umbrellaCount--;
+						umbrellaDisplay.text = ""+umbrellaCount;
+					} else {
+						flashTimer = 0;
+						dodgeCount = 0;
+						gameOver = true;
+						counterDisplay.text = ""+dodgeCount;
+
+					}
+
 					isTouchReleased = false;
 				}
 			}
@@ -68,11 +88,19 @@ public class Flashy : MonoBehaviour {
 				isTouchReleased = false;
 			}
 
+
 			if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught) {
-				dodgeCount = 0;
-				gameOver = true;
-				counterDisplay.text = ""+dodgeCount;
-				Debug.Log("Missed the flash");
+				if(umbrellaCount > 0) {
+					savedByUmbrella = true;
+					umbrellaCount--;
+					umbrellaDisplay.text = ""+umbrellaCount;
+					isFlashCaught = true;
+				} else {
+					dodgeCount = 0;
+					gameOver = true;
+					counterDisplay.text = ""+dodgeCount;
+					Debug.Log("Missed the flash");
+				}
 			}
 
 		}
@@ -127,6 +155,12 @@ public class Flashy : MonoBehaviour {
 					}
 				
 			GUILayout.EndArea();
+		}
+
+		GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
+
+		if(savedByUmbrella) {
+			GUI.Label (CENTER_SCREEN, "PHEW, THAT WAS CLOSE!");
 		}
 	}
 
