@@ -11,16 +11,23 @@ public class Flashy : MonoBehaviour {
 	public float reactionLeeway = 0.1f;
 
 	public Texture2D flashyIcon;
+	public string[] congratulatoryPhrases;
+	string congratulatoryPhrase;
 
 	float flashTimer;
 	float timeToFlash;
 
 	bool isFadingIn = false;
 	bool isFlashCaught = false;
+	bool isTouchReleased = true;
+	bool gameOver = false;
 
 	int dodgeCount = 0;
 
 	GUIContent counterDisplay = new GUIContent();
+
+	Rect CENTER_SCREEN = new Rect(Screen.width/4, Screen.height/2, Screen.width/2, 300);
+
 
 	// Use this for initialization
 	void Start () {
@@ -33,33 +40,53 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(!isFadingIn) {
+		if(!isFadingIn && !isFlashCaught && !gameOver) {
 			if(flashTimer > timeToFlash) {
 				iTween.CameraFadeTo(iTween.Hash("amount", 1.0f, "time", flashInTime, "oncompletetarget", this.gameObject, "oncomplete", "fadeOutFlash"));
 				isFadingIn = true;
 			} else {
-				if(Input.touchCount > 0 || Input.GetMouseButton(0)) {
+				if(isTouchReleased && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
 					flashTimer = 0;
 					dodgeCount = 0;
+					gameOver = true;
 					counterDisplay.text = ""+dodgeCount;
+					isTouchReleased = false;
 				}
 			}
 		}
 
 		if(isFadingIn) {
-			if(!isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
+			if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
 				dodgeCount++;
+
+				if(dodgeCount % 5 == 0) {
+					congratulatoryPhrase = congratulatoryPhrases[Mathf.RoundToInt(Random.value*(congratulatoryPhrases.Length-1))];
+				}
+
 				counterDisplay.text = ""+dodgeCount;
 				isFlashCaught = true;
+				isTouchReleased = false;
 			}
 
 			if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught) {
 				dodgeCount = 0;
+				gameOver = true;
 				counterDisplay.text = ""+dodgeCount;
 				Debug.Log("Missed the flash");
 			}
 
 		}
+
+		#if UNITY_EDITOR
+		if(Input.GetMouseButtonUp(0)) {
+			isTouchReleased = true;
+			Debug.Log("Touch released");
+		}
+		#else
+		if(Input.touchCount == 0) {
+			isTouchReleased = true;
+		}
+		#endif
 
 		flashTimer += Time.deltaTime;
 	}
@@ -83,6 +110,24 @@ public class Flashy : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin = skin;
 		GUILayout.Label(counterDisplay);
+
+		if(dodgeCount%5 == 0 && dodgeCount != 0) {
+			GUI.Label(CENTER_SCREEN, congratulatoryPhrase);
+		}
+
+		if(gameOver) {
+			GUILayout.BeginArea(CENTER_SCREEN);
+				GUILayout.Label("GAME OVER", GUILayout.Width(Screen.width/2));
+				
+					if(GUILayout.Button("RETRY", GUILayout.Width(Screen.width/2))) {
+						gameOver = false;
+					}
+
+					if(GUILayout.Button("BUY UMBRELLAS", GUILayout.Width(Screen.width/2))) {
+					}
+				
+			GUILayout.EndArea();
+		}
 	}
 
 }
