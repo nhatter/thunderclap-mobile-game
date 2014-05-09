@@ -158,10 +158,9 @@ public class Flashy : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin = skin;
 		GUILayout.Label(counterDisplay);
+		GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 
-		if(dodgeCount%5 == 0 && dodgeCount != 0) {
-			GUI.Label(CENTER_SCREEN, congratulatoryPhrase);
-		}
+
 
 		if(gameOver) {
 			GUILayout.BeginArea(CENTER_SCREEN);
@@ -176,13 +175,17 @@ public class Flashy : MonoBehaviour {
 					}
 				
 			GUILayout.EndArea();
+		} else {
+			if(savedByUmbrella) {
+				GUI.Label (CENTER_SCREEN, "PHEW, THAT WAS CLOSE!");
+			} else {
+				if(dodgeCount%5 == 0 && dodgeCount != 0) {
+					GUI.Label(CENTER_SCREEN, congratulatoryPhrase);
+				}
+			}
 		}
 
-		GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 
-		if(savedByUmbrella) {
-			GUI.Label (CENTER_SCREEN, "PHEW, THAT WAS CLOSE!");
-		}
 	}
 
 }
