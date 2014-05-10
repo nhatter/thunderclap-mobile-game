@@ -4,6 +4,10 @@ using System.Collections;
 public class Flashy : MonoBehaviour {
 	public GUISkin skin;
 	public Texture2D flashTexture;
+
+	public bool isTutorialMode = false;
+	public bool isDisplayingHealthWarning = true;
+
 	public float flashInTime = 0.25f;
 	public float flashOutTime = 0.5f;
 	public float minTimeBetweenFlash;
@@ -39,6 +43,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
+	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
 	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
 
@@ -56,7 +61,7 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(!gameOver) {
+		if(!gameOver && !isTutorialMode) {
 			// Now, assuming it isn't game over...
 			if(!isFadingIn && !isFlashCaught && !gameOver) {
 				if(flashTimer > timeToFlash) {
@@ -154,12 +159,32 @@ public class Flashy : MonoBehaviour {
 
 	void OnGUI() {
 		GUI.skin = skin;
-		GUILayout.Label(counterDisplay);
-		GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
+
+		if(isTutorialMode) {
+			GUILayout.BeginArea(ENTIRE_SCREEN);
+			if(isDisplayingHealthWarning) {
+				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
+
+				if(GUILayout.Button("OK")) {
+					isDisplayingHealthWarning = false;
+				}
+			} else {
+
+				GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE. THIS IS A HARD GAME.");
+					
+				if(GUILayout.Button("PLAY")) {
+					isTutorialMode = false;
+					isTouchReleased = false;
+				}
+			}
+			GUILayout.EndArea();
+		} else {
+			GUILayout.Label(counterDisplay);
+			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
+		}
 
 
-
-		if(gameOver) {
+		if(gameOver && !isTutorialMode) {
 			GUILayout.BeginArea(CENTER_SCREEN);
 				GUILayout.Label("GAME OVER");
 				
