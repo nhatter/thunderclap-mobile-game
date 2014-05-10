@@ -171,7 +171,7 @@ public class Flashy : MonoBehaviour {
 		GUI.skin = skin;
 
 		if(isTutorialMode) {
-			GUILayout.BeginArea(ENTIRE_SCREEN, "Credits", "Credit");
+			GUILayout.BeginArea(ENTIRE_SCREEN);
 			if(isDisplayingCredits) {
 				if(GUILayout.Button("BACK")) {
 					isDisplayingCredits = false;
@@ -199,9 +199,10 @@ public class Flashy : MonoBehaviour {
 						isDisplayingHealthWarning = false;
 					}
 				} else {
+					#if !UNITY_EDITOR
+						GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
+					#endif
 
-					GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE. THIS IS A HARD GAME.");
-						
 					if(GUILayout.Button("PLAY")) {
 						isTutorialMode = false;
 						isTouchReleased = false;
@@ -218,52 +219,55 @@ public class Flashy : MonoBehaviour {
 			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 		}
 
+		if(!isTutorialMode) {
+			if(gameOver) {
+				GUILayout.BeginArea(CENTER_SCREEN);
+					GUILayout.Label("GAME OVER");
+					GUILayout.Space(20);
+					GUILayout.Label("SCORE: "+dodgeCount);
+					GUILayout.Label("   BEST: "+bestScore);
+					
+						if(GUILayout.Button("RETRY")) {
+							initFlash();
 
-		if(gameOver && !isTutorialMode) {
-			GUILayout.BeginArea(CENTER_SCREEN);
-				GUILayout.Label("GAME OVER");
-				GUILayout.Space(20);
-				GUILayout.Label("SCORE: "+dodgeCount);
-				GUILayout.Label("   BEST: "+bestScore);
-				
-					if(GUILayout.Button("RETRY")) {
-						initFlash();
+							// Reset score
+							dodgeCount = 0;
+							counterDisplay.text = ""+dodgeCount;
 
-						// Reset score
-						dodgeCount = 0;
-						counterDisplay.text = ""+dodgeCount;
+							// Important: start game loop by assuming button pressed
+							// to avoid false positive
+							isTouchReleased = false;
 
-						// Important: start game loop by assuming button pressed
-						// to avoid false positive
-						isTouchReleased = false;
+							savedByUmbrella = false;
 
-						savedByUmbrella = false;
+							// Active main game loop
+							gameOver = false;
 
-						// Active main game loop
-						gameOver = false;
+							Debug.Log("Retry pressed");
+						}
 
-						Debug.Log("Retry pressed");
-					}
-
-					if(GUILayout.Button("BUY UMBRELLAS")) {
-					}
-				
-			GUILayout.EndArea();
-		} else {
-			if(savedByUmbrella) {
-				GUI.Label (CENTER_SCREEN_MESSAGE, "PHEW, THAT WAS CLOSE!");
+						if(GUILayout.Button("BUY UMBRELLAS")) {
+						}
+					
+				GUILayout.EndArea();
 			} else {
-				if(dodgeCount == 1) {
-					GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
-				}
+				if(savedByUmbrella) {
+					GUI.Label (CENTER_SCREEN_MESSAGE, "PHEW, THAT WAS CLOSE!");
+				} else {
+					if(dodgeCount == 0) {
+						GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
+					}
 
-				if(dodgeCount%5 == 0 && dodgeCount != 0) {
-					GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+					if(dodgeCount == 1) {
+						GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
+					}
+
+					if(dodgeCount%5 == 0 && dodgeCount != 0) {
+						GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+					}
 				}
 			}
 		}
-
-
 	}
 
 }
