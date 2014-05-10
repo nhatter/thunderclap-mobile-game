@@ -38,13 +38,17 @@ public class Flashy : MonoBehaviour {
 
 	int dodgeCount = 0;
 	int umbrellaCount = 1;
+	
+	int bestScore = 0;
 
 
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
 	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
-	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
+	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 600);
+	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
+
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
 
 	// Use this for initialization
@@ -76,11 +80,14 @@ public class Flashy : MonoBehaviour {
 							umbrellaDisplay.text = ""+umbrellaCount;
 						} else {
 							flashTimer = 0;
-							dodgeCount = 0;
+							if(dodgeCount > bestScore) {
+								bestScore = dodgeCount;
+							}
+
 							gameOver = true;
 							counterDisplay.text = ""+dodgeCount;
 							audio.PlayOneShot(zapSound);
-							isVibrating = true;
+
 							Debug.Log("Game over by early/late touch");
 						}
 
@@ -116,7 +123,9 @@ public class Flashy : MonoBehaviour {
 						umbrellaDisplay.text = ""+umbrellaCount;
 						isFlashCaught = true;
 					} else {
-						dodgeCount = 0;
+						if(dodgeCount > bestScore) {
+							bestScore = dodgeCount;
+						}
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
 						audio.PlayOneShot(zapSound);
@@ -187,9 +196,16 @@ public class Flashy : MonoBehaviour {
 		if(gameOver && !isTutorialMode) {
 			GUILayout.BeginArea(CENTER_SCREEN);
 				GUILayout.Label("GAME OVER");
+				GUILayout.Space(20);
+				GUILayout.Label("SCORE: "+dodgeCount);
+				GUILayout.Label("   BEST: "+bestScore);
 				
 					if(GUILayout.Button("RETRY")) {
 						initFlash();
+
+						// Reset score
+						dodgeCount = 0;
+						counterDisplay.text = ""+dodgeCount;
 
 						// Important: start game loop by assuming button pressed
 						// to avoid false positive
@@ -209,14 +225,14 @@ public class Flashy : MonoBehaviour {
 			GUILayout.EndArea();
 		} else {
 			if(savedByUmbrella) {
-				GUI.Label (CENTER_SCREEN, "PHEW, THAT WAS CLOSE!");
+				GUI.Label (CENTER_SCREEN_MESSAGE, "PHEW, THAT WAS CLOSE!");
 			} else {
 				if(dodgeCount == 1) {
-					GUI.Label(CENTER_SCREEN, "YOU'VE GOT IT!");
+					GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
 				}
 
 				if(dodgeCount%5 == 0 && dodgeCount != 0) {
-					GUI.Label(CENTER_SCREEN, congratulatoryPhrase);
+					GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
 				}
 			}
 		}
