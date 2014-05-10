@@ -27,6 +27,7 @@ public class Flashy : MonoBehaviour {
 
 	public AudioClip zapSound;
 	public AudioClip caughtSound;
+	public AudioClip music;
 
 	float flashTimer;
 	float timeToFlash;
@@ -66,6 +67,10 @@ public class Flashy : MonoBehaviour {
 
 		umbrellaDisplay.image = umbrellaIcon;
 		umbrellaDisplay.text = ""+umbrellaCount;
+
+		audio.clip = music;
+		audio.Play();
+		audio.loop = true;
 	}
 	
 	// Update is called once per frame
@@ -210,6 +215,8 @@ public class Flashy : MonoBehaviour {
 						GUILayout.Label("ONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nUMBRELLAS ALLOW YOU TO MAKE A MISTAKE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
 						if(GUILayout.Button("PLAY")) {
 							menuScreenMode = MenuScreenMode.GAME;
+							isTouchReleased = false;
+							audio.Stop();
 						}
 			break;
 
@@ -221,6 +228,7 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("PLAY")) {
 							menuScreenMode = MenuScreenMode.GAME;
 							isTouchReleased = false;
+							audio.Stop();
 						}
 
 						if(GUILayout.Button("HOW TO PLAY")) {
