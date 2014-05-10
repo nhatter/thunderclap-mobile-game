@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class Flashy : MonoBehaviour {
+	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME};
+	public MenuScreenMode menuScreenMode = MenuScreenMode.HEALTH_WARNING;
+
 	public GUISkin skin;
 	public Texture2D flashTexture;
 
@@ -17,6 +20,7 @@ public class Flashy : MonoBehaviour {
 
 	public Texture2D flashyIcon;
 	public Texture2D umbrellaIcon;
+	public Texture2D thunderclapLogo;
 
 	public string[] congratulatoryPhrases;
 	string congratulatoryPhrase;
@@ -66,7 +70,7 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(!gameOver && !isTutorialMode) {
+		if(!gameOver && menuScreenMode == MenuScreenMode.GAME) {
 			// Now, assuming it isn't game over...
 			if(!isFadingIn && !isFlashCaught && !gameOver) {
 				if(flashTimer > timeToFlash) {
@@ -170,11 +174,12 @@ public class Flashy : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin = skin;
 
-		if(isTutorialMode) {
-			GUILayout.BeginArea(ENTIRE_SCREEN);
-			if(isDisplayingCredits) {
+		//GUILayout.BeginArea(ENTIRE_SCREEN);
+		switch(menuScreenMode) {
+		
+			case MenuScreenMode.CREDITS:
 				if(GUILayout.Button("BACK")) {
-					isDisplayingCredits = false;
+					menuScreenMode = MenuScreenMode.MAIN_MENU;
 				}
 
 				GUILayout.BeginVertical();
@@ -191,35 +196,50 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("Mark Salvin (marksalvin.com)");
 				GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
 				GUILayout.EndVertical();
-			} else {
-				if(isDisplayingHealthWarning) {
-					GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
+			break;
+		
+			case MenuScreenMode.HEALTH_WARNING:
+				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
 
-					if(GUILayout.Button("OK")) {
-						isDisplayingHealthWarning = false;
-					}
-				} else {
-					#if !UNITY_EDITOR
-						GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
-					#endif
-
-					if(GUILayout.Button("PLAY")) {
-						isTutorialMode = false;
-						isTouchReleased = false;
-					}
-
-					if(GUILayout.Button("CREDITS")) {
-						isDisplayingCredits = true;
-					}
+				if(GUILayout.Button("OK")) {
+					menuScreenMode = MenuScreenMode.MAIN_MENU;
 				}
-			}
-			GUILayout.EndArea();
-		} else {
+			break;
+
+			case MenuScreenMode.HOW_TO_PLAY:
+						GUILayout.Label("ONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nUMBRELLAS ALLOW YOU TO MAKE A MISTAKE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
+						if(GUILayout.Button("PLAY")) {
+							menuScreenMode = MenuScreenMode.GAME;
+						}
+			break;
+
+			case MenuScreenMode.MAIN_MENU:
+
+					GUI.BeginGroup(CENTER_SCREEN);
+						GUILayout.Label(thunderclapLogo);
+						GUILayout.Space(25);
+						if(GUILayout.Button("PLAY")) {
+							menuScreenMode = MenuScreenMode.GAME;
+							isTouchReleased = false;
+						}
+
+						if(GUILayout.Button("HOW TO PLAY")) {
+							menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
+						}
+
+						if(GUILayout.Button("CREDITS")) {
+							menuScreenMode = MenuScreenMode.CREDITS;
+						}
+					GUI.EndGroup();
+			break;
+		}// End of GUI switch statement
+
+		//GUILayout.EndArea();
+			
+		if(menuScreenMode == MenuScreenMode.GAME) {
 			GUILayout.Label(counterDisplay);
 			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
-		}
 
-		if(!isTutorialMode) {
 			if(gameOver) {
 				GUILayout.BeginArea(CENTER_SCREEN);
 					GUILayout.Label("GAME OVER");
