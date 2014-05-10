@@ -7,6 +7,7 @@ public class Flashy : MonoBehaviour {
 
 	public bool isTutorialMode = false;
 	public bool isDisplayingHealthWarning = true;
+	public bool isDisplayingCredits = false;
 
 	public float flashInTime = 0.25f;
 	public float flashOutTime = 0.5f;
@@ -170,20 +171,45 @@ public class Flashy : MonoBehaviour {
 		GUI.skin = skin;
 
 		if(isTutorialMode) {
-			GUILayout.BeginArea(ENTIRE_SCREEN);
-			if(isDisplayingHealthWarning) {
-				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
-
-				if(GUILayout.Button("OK")) {
-					isDisplayingHealthWarning = false;
+			GUILayout.BeginArea(ENTIRE_SCREEN, "Credits", "Credit");
+			if(isDisplayingCredits) {
+				if(GUILayout.Button("BACK")) {
+					isDisplayingCredits = false;
 				}
-			} else {
 
-				GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE. THIS IS A HARD GAME.");
-					
-				if(GUILayout.Button("PLAY")) {
-					isTutorialMode = false;
-					isTouchReleased = false;
+				GUILayout.BeginVertical();
+
+				GUILayout.Space(20);
+				GUILayout.Label ("\"Woo-sh\" GAME OVER SOUND");
+				GUILayout.Label ("woosh_02.wav by Glaneur de sons (http://www.freesound.org/people/Glaneur%20de%20sons/sounds/34172/)");
+				GUILayout.Label ("Licensed under Creative Commons Share Alike 3.0 (http://creativecommons.org/licenses/by/3.0/)");
+				GUILayout.Space(20);
+				GUILayout.Label("SPECIAL THANKS");
+				GUILayout.Label("Adam James (Meownoodle on YouTube)");
+				GUILayout.Label("Robert Streeting (robsws.co.uk)");
+				GUILayout.Label("Charles Payne (business-aspirations.com)");
+				GUILayout.Label("Mark Salvin (marksalvin.com)");
+				GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
+				GUILayout.EndVertical();
+			} else {
+				if(isDisplayingHealthWarning) {
+					GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
+
+					if(GUILayout.Button("OK")) {
+						isDisplayingHealthWarning = false;
+					}
+				} else {
+
+					GUILayout.Label("THUNDERCLAP\n\nONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE. THIS IS A HARD GAME.");
+						
+					if(GUILayout.Button("PLAY")) {
+						isTutorialMode = false;
+						isTouchReleased = false;
+					}
+
+					if(GUILayout.Button("CREDITS")) {
+						isDisplayingCredits = true;
+					}
 				}
 			}
 			GUILayout.EndArea();
