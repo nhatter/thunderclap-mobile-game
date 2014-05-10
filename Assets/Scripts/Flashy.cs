@@ -17,6 +17,7 @@ public class Flashy : MonoBehaviour {
 	string congratulatoryPhrase;
 
 	public AudioClip zapSound;
+	public AudioClip caughtSound;
 
 	float flashTimer;
 	float timeToFlash;
@@ -73,8 +74,9 @@ public class Flashy : MonoBehaviour {
 							dodgeCount = 0;
 							gameOver = true;
 							counterDisplay.text = ""+dodgeCount;
-
+							audio.PlayOneShot(zapSound);
 							isVibrating = true;
+							Debug.Log("Game over by early/late touch");
 						}
 
 						isTouchReleased = false;
@@ -83,8 +85,13 @@ public class Flashy : MonoBehaviour {
 			}
 
 			if(isFadingIn) {
+				Debug.Log("Fade in !!!");
+			}
+			if(isFadingIn) {
 				if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
 					dodgeCount++;
+
+					audio.PlayOneShot(caughtSound);
 
 					if(dodgeCount % 5 == 0) {
 						congratulatoryPhrase = congratulatoryPhrases[Mathf.RoundToInt(Random.value*(congratulatoryPhrases.Length-1))];
@@ -94,9 +101,10 @@ public class Flashy : MonoBehaviour {
 					isFlashCaught = true;
 					isTouchReleased = false;
 				}
+			
 
-
-				if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught & !gameOver) {
+				if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught && !gameOver) {
+					Debug.Log("DEBUG");
 					if(umbrellaCount > 0) {
 						savedByUmbrella = true;
 						umbrellaCount--;
@@ -106,6 +114,7 @@ public class Flashy : MonoBehaviour {
 						dodgeCount = 0;
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
+						audio.PlayOneShot(zapSound);
 						Debug.Log("Missed the flash");
 					}
 				}
@@ -136,7 +145,7 @@ public class Flashy : MonoBehaviour {
 		iTween.CameraFadeTo(iTween.Hash("amount", 0.0f, "time", flashOutTime, "oncompletetarget", this.gameObject, "oncomplete", "initFlash"));
 	}
 
-	void initFlash() {
+	public void initFlash() {
 		isFlashCaught = false;
 		isFadingIn = false;
 		flashTimer = 0;
@@ -155,9 +164,18 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("GAME OVER");
 				
 					if(GUILayout.Button("RETRY")) {
-						gameOver = false;
 						initFlash();
+
+						// Important: start game loop by assuming button pressed
+						// to avoid false positive
+						isTouchReleased = false;
+
 						savedByUmbrella = false;
+
+						// Active main game loop
+						gameOver = false;
+
+						Debug.Log("Retry pressed");
 					}
 
 					if(GUILayout.Button("BUY UMBRELLAS")) {
