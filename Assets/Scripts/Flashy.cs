@@ -110,7 +110,7 @@ public class Flashy : MonoBehaviour {
 				Debug.Log("Fade in !!!");
 			}
 			if(isFadingIn) {
-				if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
+				if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+flashOutTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
 					dodgeCount++;
 
 					audio.PlayOneShot(caughtSound);
@@ -125,7 +125,7 @@ public class Flashy : MonoBehaviour {
 				}
 			
 
-				if(flashTimer > timeToFlash+flashInTime+reactionLeeway && !isFlashCaught && !gameOver) {
+				if(flashTimer > timeToFlash+flashInTime+flashOutTime+reactionLeeway && !isFlashCaught && !gameOver) {
 					Debug.Log("DEBUG");
 					if(umbrellaCount > 0) {
 						savedByUmbrella = true;
