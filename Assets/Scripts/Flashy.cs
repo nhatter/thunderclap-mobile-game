@@ -43,7 +43,7 @@ public class Flashy : MonoBehaviour {
 	public float timeToVibrate = 1.0f;
 
 	int dodgeCount = 0;
-	int umbrellaCount = 1;
+	public int umbrellaCount = 1;
 	
 	int bestScore = 0;
 
@@ -52,7 +52,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent umbrellaDisplay = new GUIContent();
 
 	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
-	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 600);
+	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 800);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
@@ -91,7 +91,7 @@ public class Flashy : MonoBehaviour {
 					savedByUmbrella = false;
 				} else {
 					if(isTouchReleased && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
-						if(umbrellaCount > 0 && !savedByUmbrella) {
+						if(umbrellaCount > 0) {
 							savedByUmbrella = true;
 							umbrellaCount--;
 							umbrellaDisplay.text = ""+umbrellaCount;
@@ -285,12 +285,22 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("BUY UMBRELLAS")) {
 							iap.Purchase("3_UMBRELLAS");
 						}
+
+						if(GUILayout.Button("BUY CARRY ON")) {
+							iap.Purchase("CARRY_ON");
+						}
+
+						if(GUILayout.Button("BUY MORE TIME")) {
+							iap.Purchase("MORE_TIME");
+						}
+				
+
 						#endif
-					
+							
 				GUILayout.EndArea();
 			} else {
 				if(savedByUmbrella) {
-					GUI.Label (CENTER_SCREEN_MESSAGE, "PHEW, THAT WAS CLOSE!");
+					GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
 				} else {
 					if(dodgeCount == 0) {
 						GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
@@ -313,6 +323,21 @@ public class Flashy : MonoBehaviour {
 			case "3_UMBRELLAS":
 				umbrellaCount+= 3;
 				umbrellaDisplay.text = ""+umbrellaCount;
+			break;
+
+			case "CARRY_ON":
+				// Important: start game loop by assuming button pressed
+				// to avoid false positive
+				isTouchReleased = false;
+				
+				savedByUmbrella = false;
+				
+				// Active main game loop
+				gameOver = false;
+			break;
+
+			case "EXTRA_TIME":
+				reactionLeeway = 0.05f;
 			break;
 		}
 	}

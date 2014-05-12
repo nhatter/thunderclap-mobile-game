@@ -19,8 +19,6 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
 
 @implementation IAPManager
 
-#define kInAppPurchaseProUpgradeProductId @"3_UMBRELLAS"
-
 #pragma mark -
 #pragma mark SKProductsRequestDelegate methods
 
@@ -71,12 +69,9 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
 //
 - (void)recordTransaction:(SKPaymentTransaction *)transaction
 {
-    if ([transaction.payment.productIdentifier isEqualToString:kInAppPurchaseProUpgradeProductId])
-    {
-        // save the transaction receipt to disk
-        [[NSUserDefaults standardUserDefaults] setValue:[NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]] forKey:@"proUpgradeTransactionReceipt" ];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+    // save the transaction receipt to disk
+    [[NSUserDefaults standardUserDefaults] setValue:[NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]] forKey:transaction.payment.productIdentifier ];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 //
@@ -84,17 +79,12 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
 //
 - (void)provideContent:(NSString *)productID
 {
-    NSLog(@"Given product: %@", productID);
+    NSLog(@"Product provided: %@", productID);
     
-    if ([productID isEqualToString:kInAppPurchaseProUpgradeProductId])
-    {
-        NSLog(@"Product provided: %@", productID);
-        
-        const char *gameObj = "Main";
-        const char *methodName = "unlockIAP";
-        const char *msg = [productID cStringUsingEncoding:NSASCIIStringEncoding];
-        UnitySendMessage (gameObj, methodName, msg);
-    }
+    const char *gameObj = "Main";
+    const char *methodName = "unlockIAP";
+    const char *msg = [productID cStringUsingEncoding:NSASCIIStringEncoding];
+    UnitySendMessage (gameObj, methodName, msg);
 }
 
 //
