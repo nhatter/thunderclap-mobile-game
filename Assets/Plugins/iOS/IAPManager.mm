@@ -82,13 +82,18 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
 //
 // enable pro features
 //
-- (void)provideContent:(NSString *)productId
+- (void)provideContent:(NSString *)productID
 {
-    if ([productId isEqualToString:kInAppPurchaseProUpgradeProductId])
+    NSLog(@"Given product: %@", productID);
+    
+    if ([productID isEqualToString:kInAppPurchaseProUpgradeProductId])
     {
-        // enable the pro features
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"isProUpgradePurchased" ];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        NSLog(@"Product provided: %@", productID);
+        
+        const char *gameObj = "Main";
+        const char *methodName = "unlockIAP";
+        const char *msg = [productID cStringUsingEncoding:NSASCIIStringEncoding];
+        UnitySendMessage (gameObj, methodName, msg);
     }
 }
 
@@ -193,6 +198,7 @@ extern "C" {
 void *_IAPManager_Init()
 {
 	id instance = [IAPManager alloc];
+    [instance loadStore];
 	return (void *)instance;
 }
 
@@ -214,4 +220,3 @@ void _IAPManager_Destroy(void *instance)
 	IAPManager *iap = (IAPManager *)instance;
 	[iap release];
 }
-

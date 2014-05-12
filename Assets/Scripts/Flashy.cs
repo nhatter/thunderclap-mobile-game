@@ -308,4 +308,13 @@ public class Flashy : MonoBehaviour {
 		}
 	}
 
+	public void unlockIAP(string productID) {
+		switch(productID) {
+			case "3_UMBRELLAS":
+				umbrellaCount+= 3;
+				umbrellaDisplay.text = ""+umbrellaCount;
+			break;
+		}
+	}
+
 }
