@@ -57,6 +57,8 @@ public class Flashy : MonoBehaviour {
 
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
 
+	IAPManagerObject iap;
+
 	// Use this for initialization
 	void Start () {
 		iTween.CameraFadeAdd(flashTexture);
@@ -71,6 +73,11 @@ public class Flashy : MonoBehaviour {
 		audio.clip = music;
 		audio.Play();
 		audio.loop = true;
+
+		#if !UNITY_EDITOR
+		iap = (new GameObject("PassViewObject")).AddComponent<IAPManagerObject>();
+		iap.Init();
+		#endif
 	}
 	
 	// Update is called once per frame
@@ -274,8 +281,11 @@ public class Flashy : MonoBehaviour {
 							Debug.Log("Retry pressed");
 						}
 
+						#if !UNITY_EDITOR
 						if(GUILayout.Button("BUY UMBRELLAS")) {
+							iap.Purchase("3_UMBRELLAS");
 						}
+						#endif
 					
 				GUILayout.EndArea();
 			} else {
