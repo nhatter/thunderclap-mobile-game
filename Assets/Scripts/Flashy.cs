@@ -56,6 +56,7 @@ public class Flashy : MonoBehaviour {
 	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 800);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
+	Rect TOP_LEFT_SCREEN = new Rect(50, 0, 150, 125);
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 150, 0, 150, 125);
 
 	IAPManagerObject iap;
@@ -301,7 +302,7 @@ public class Flashy : MonoBehaviour {
 		//GUILayout.EndArea();
 			
 		if(menuScreenMode == MenuScreenMode.GAME) {
-			GUILayout.Label(counterDisplay);
+			GUI.Label(TOP_LEFT_SCREEN, counterDisplay);
 			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 
 			if(gameOver) {
