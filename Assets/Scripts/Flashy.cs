@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.IO;
 
 public class Flashy : MonoBehaviour {
 	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME};
@@ -16,7 +18,6 @@ public class Flashy : MonoBehaviour {
 	public float flashOutTime = 0.5f;
 	public float minTimeBetweenFlash;
 	public float maxTimeBetweenFlash;
-	public float reactionLeeway = 0.1f;
 	public float gameOverDelayTime = 0.5f;
 	float gameOverDelayTimer = 0;
 	bool isShowingGameOverMenu = false;
@@ -39,6 +40,7 @@ public class Flashy : MonoBehaviour {
 	bool isFlashCaught = false;
 	bool isTouchReleased = true;
 	bool gameOver = false;
+	bool hasSavedGameState = false;
 	bool savedByUmbrella = false;
 	bool isVibrating = false;
 
@@ -46,10 +48,6 @@ public class Flashy : MonoBehaviour {
 	public float timeToVibrate = 1.0f;
 
 	int dodgeCount = 0;
-	public int umbrellaCount = 1;
-	
-	int bestScore = 0;
-
 
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
@@ -63,6 +61,11 @@ public class Flashy : MonoBehaviour {
 	IAPManagerObject iap;
 	bool isIAPEnabled = false;
 
+	Player player = new Player();
+
+	string DATA_PATH;
+	string PLAYER_XML_FILE;
+
 	// Use this for initialization
 	void Start () {
 		iTween.CameraFadeAdd(flashTexture);
@@ -72,7 +75,7 @@ public class Flashy : MonoBehaviour {
 		counterDisplay.text = ""+dodgeCount;
 
 		umbrellaDisplay.image = umbrellaIcon;
-		umbrellaDisplay.text = ""+umbrellaCount;
+		umbrellaDisplay.text = ""+player.umbrellaCount;
 
 		audio.clip = music;
 		audio.Play();
@@ -83,6 +86,29 @@ public class Flashy : MonoBehaviour {
 		iap.Init();
 		iap.CanMakePurchases();
 		#endif
+
+		DATA_PATH = Application.persistentDataPath+"/";
+		PLAYER_XML_FILE = DATA_PATH + "player.xml";
+
+		loadPlayer();
+	}
+
+	void loadPlayer() {
+		if(File.Exists(PLAYER_XML_FILE)) {
+			try {
+				player = XMLManager.load<Player>(PLAYER_XML_FILE);
+			} catch (Exception e) {
+				Debug.Log("Error parsing giftgaming Player file " + e);
+			}
+		}
+	}
+
+	void savePlayer() {
+		try {
+			XMLManager.save<Player>(player, PLAYER_XML_FILE);
+		} catch (Exception e) {
+			Debug.Log("Error parsing giftgaming Player file " + e);
+		}
 	}
 	
 	// Update is called once per frame
@@ -96,14 +122,14 @@ public class Flashy : MonoBehaviour {
 					savedByUmbrella = false;
 				} else {
 					if(isTouchReleased && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
-						if(umbrellaCount > 0) {
+						if(player.umbrellaCount > 0) {
 							savedByUmbrella = true;
-							umbrellaCount--;
-							umbrellaDisplay.text = ""+umbrellaCount;
+							player.umbrellaCount--;
+							umbrellaDisplay.text = ""+player.umbrellaCount;
 						} else {
 							flashTimer = 0;
-							if(dodgeCount > bestScore) {
-								bestScore = dodgeCount;
+							if(dodgeCount > player.bestScore) {
+								player.bestScore = dodgeCount;
 							}
 
 							gameOver = true;
@@ -122,13 +148,13 @@ public class Flashy : MonoBehaviour {
 				Debug.Log("Fade in !!!");
 			}
 			if(isFadingIn) {
-				if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+flashOutTime+reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
+				if(isTouchReleased && !isFlashCaught && flashTimer >= timeToFlash && flashTimer <= timeToFlash+flashInTime+flashOutTime+player.reactionLeeway && (Input.touchCount > 0 || Input.GetMouseButton(0))) {
 					dodgeCount++;
 
 					audio.PlayOneShot(caughtSound);
 
 					if(dodgeCount % 5 == 0) {
-						congratulatoryPhrase = congratulatoryPhrases[Mathf.RoundToInt(Random.value*(congratulatoryPhrases.Length-1))];
+						congratulatoryPhrase = congratulatoryPhrases[Mathf.RoundToInt(UnityEngine.Random.value*(congratulatoryPhrases.Length-1))];
 					}
 
 					counterDisplay.text = ""+dodgeCount;
@@ -137,16 +163,16 @@ public class Flashy : MonoBehaviour {
 				}
 			
 
-				if(flashTimer > timeToFlash+flashInTime+flashOutTime+reactionLeeway && !isFlashCaught && !gameOver) {
+				if(flashTimer > timeToFlash+flashInTime+flashOutTime+player.reactionLeeway && !isFlashCaught && !gameOver) {
 					Debug.Log("DEBUG");
-					if(umbrellaCount > 0) {
+					if(player.umbrellaCount > 0) {
 						savedByUmbrella = true;
-						umbrellaCount--;
-						umbrellaDisplay.text = ""+umbrellaCount;
+						player.umbrellaCount--;
+						umbrellaDisplay.text = ""+player.umbrellaCount;
 						isFlashCaught = true;
 					} else {
-						if(dodgeCount > bestScore) {
-							bestScore = dodgeCount;
+						if(dodgeCount > player.bestScore) {
+							player.bestScore = dodgeCount;
 						}
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
@@ -162,6 +188,11 @@ public class Flashy : MonoBehaviour {
 
 		if(gameOver) { 
 			gameOverDelayTimer += Time.deltaTime;
+
+			if(!hasSavedGameState) {
+				savePlayer();
+				hasSavedGameState = true;
+			}
 			
 			if(gameOverDelayTimer >= gameOverDelayTime) {
 				isShowingGameOverMenu = true;
@@ -183,7 +214,7 @@ public class Flashy : MonoBehaviour {
 
 
 	void calculateTimeToFlash() {
-		timeToFlash = minTimeBetweenFlash + Random.value*maxTimeBetweenFlash;
+		timeToFlash = minTimeBetweenFlash + UnityEngine.Random.value*maxTimeBetweenFlash;
 	}
 
 	void fadeOutFlash() {
@@ -274,10 +305,10 @@ public class Flashy : MonoBehaviour {
 					GUILayout.Label("GAME OVER");
 					GUILayout.Space(20);
 					GUILayout.Label("SCORE: "+dodgeCount);
-					GUILayout.Label("   BEST: "+bestScore);
+					GUILayout.Label("   BEST: "+player.bestScore);
 					
 
-						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+						if(isTouchReleased && isShowingGameOverMenu) {
 							GUI.enabled = true;
 						} else {
 							GUI.enabled = false;
@@ -298,9 +329,16 @@ public class Flashy : MonoBehaviour {
 
 							// Active main game loop
 							gameOver = false;
+							hasSavedGameState = false;
 							isShowingGameOverMenu = false;
 						
 							Debug.Log("Retry pressed");
+						}
+
+						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+							GUI.enabled = true;
+						} else {
+							GUI.enabled = false;
 						}
 
 						#if !UNITY_EDITOR
@@ -344,8 +382,9 @@ public class Flashy : MonoBehaviour {
 	public void unlockIAP(string productID) {
 		switch(productID) {
 			case "3_UMBRELLAS":
-				umbrellaCount+= 3;
-				umbrellaDisplay.text = ""+umbrellaCount;
+				player.umbrellaCount+= 3;
+				umbrellaDisplay.text = ""+player.umbrellaCount;
+				savePlayer();
 			break;
 
 			case "CARRY_ON":
@@ -357,11 +396,13 @@ public class Flashy : MonoBehaviour {
 				
 				// Active main game loop
 				gameOver = false;
+				hasSavedGameState = false;
 				isShowingGameOverMenu = false;
 			break;
 
 			case "EXTRA_TIME":
-				reactionLeeway = 0.1f;
+				player.reactionLeeway = 0.1f;
+				savePlayer();
 			break;
 		}
 	}
