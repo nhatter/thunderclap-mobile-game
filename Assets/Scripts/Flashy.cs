@@ -56,7 +56,7 @@ public class Flashy : MonoBehaviour {
 	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 800);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
-	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
+	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 150, 0, 150, 125);
 
 	IAPManagerObject iap;
 	bool isIAPEnabled = false;
@@ -89,7 +89,7 @@ public class Flashy : MonoBehaviour {
 
 		DATA_PATH = Application.persistentDataPath+"/";
 		PLAYER_XML_FILE = DATA_PATH + "player.xml";
-
+		Debug.Log("Player file is stored at :"+ PLAYER_XML_FILE);
 		loadPlayer();
 	}
 
@@ -101,6 +101,9 @@ public class Flashy : MonoBehaviour {
 				Debug.Log("Error parsing giftgaming Player file " + e);
 			}
 		}
+
+		// Update GUI
+		umbrellaDisplay.text = ""+player.umbrellaCount;
 	}
 
 	void savePlayer() {
@@ -126,6 +129,7 @@ public class Flashy : MonoBehaviour {
 							savedByUmbrella = true;
 							player.umbrellaCount--;
 							umbrellaDisplay.text = ""+player.umbrellaCount;
+
 						} else {
 							flashTimer = 0;
 							if(dodgeCount > player.bestScore) {
