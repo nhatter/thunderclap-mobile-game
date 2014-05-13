@@ -361,7 +361,20 @@ public class Flashy : MonoBehaviour {
 
 						#endif
 
+					if(isTouchReleased && isShowingGameOverMenu) {
+						GUI.enabled = true;
+					} else {
+						GUI.enabled = false;
+					}
+
+					if(GUILayout.Button("MAIN MENU")) {
+						menuScreenMode = MenuScreenMode.MAIN_MENU;
+					}
+
 					GUI.enabled = true;
+
+					
+					
 				
 				GUILayout.EndArea();
 			} else {
