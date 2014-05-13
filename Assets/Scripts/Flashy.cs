@@ -17,6 +17,9 @@ public class Flashy : MonoBehaviour {
 	public float minTimeBetweenFlash;
 	public float maxTimeBetweenFlash;
 	public float reactionLeeway = 0.1f;
+	public float gameOverDelayTime = 0.5f;
+	float gameOverDelayTimer = 0;
+	bool isShowingGameOverMenu = false;
 
 	public Texture2D flashyIcon;
 	public Texture2D umbrellaIcon;
@@ -58,6 +61,7 @@ public class Flashy : MonoBehaviour {
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 100, 0, 100, 125);
 
 	IAPManagerObject iap;
+	bool isIAPEnabled = false;
 
 	// Use this for initialization
 	void Start () {
@@ -77,6 +81,7 @@ public class Flashy : MonoBehaviour {
 		#if !UNITY_EDITOR
 		iap = (new GameObject("PassViewObject")).AddComponent<IAPManagerObject>();
 		iap.Init();
+		iap.CanMakePurchases();
 		#endif
 	}
 	
@@ -152,7 +157,19 @@ public class Flashy : MonoBehaviour {
 
 			}
 
-			#if UNITY_EDITOR
+			flashTimer += Time.deltaTime;
+		}
+
+		if(gameOver) { 
+			gameOverDelayTimer += Time.deltaTime;
+			
+			if(gameOverDelayTimer >= gameOverDelayTime) {
+				isShowingGameOverMenu = true;
+				gameOverDelayTimer = 0;
+			}
+		}
+		
+		#if UNITY_EDITOR
 			if(Input.GetMouseButtonUp(0)) {
 				isTouchReleased = true;
 				Debug.Log("Touch released");
@@ -162,9 +179,6 @@ public class Flashy : MonoBehaviour {
 				isTouchReleased = true;
 			}
 			#endif
-
-			flashTimer += Time.deltaTime;
-		}
 	}
 
 
@@ -262,6 +276,13 @@ public class Flashy : MonoBehaviour {
 					GUILayout.Label("SCORE: "+dodgeCount);
 					GUILayout.Label("   BEST: "+bestScore);
 					
+
+						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+							GUI.enabled = true;
+						} else {
+							GUI.enabled = false;
+						}
+
 						if(GUILayout.Button("RETRY")) {
 							initFlash();
 
@@ -277,7 +298,8 @@ public class Flashy : MonoBehaviour {
 
 							// Active main game loop
 							gameOver = false;
-
+							isShowingGameOverMenu = false;
+						
 							Debug.Log("Retry pressed");
 						}
 
@@ -293,10 +315,11 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("BUY MORE TIME")) {
 							iap.Purchase("MORE_TIME");
 						}
-				
 
 						#endif
-							
+
+					GUI.enabled = true;
+				
 				GUILayout.EndArea();
 			} else {
 				if(savedByUmbrella) {
@@ -334,10 +357,19 @@ public class Flashy : MonoBehaviour {
 				
 				// Active main game loop
 				gameOver = false;
+				isShowingGameOverMenu = false;
 			break;
 
 			case "EXTRA_TIME":
-				reactionLeeway = 0.05f;
+				reactionLeeway = 0.1f;
+			break;
+		}
+	}
+
+	public void canMakePurchases(string iOSResult) {
+		switch(iOSResult) {
+			case "true":
+				isIAPEnabled = true;
 			break;
 		}
 	}

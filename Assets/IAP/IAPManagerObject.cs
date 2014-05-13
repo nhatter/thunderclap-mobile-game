@@ -58,7 +58,7 @@ public class IAPManagerObject : MonoBehaviour {
 		[DllImport("__Internal")]
 		private static extern int _IAPManager_Destroy(IntPtr instance);
 		[DllImport("__Internal")]
-		private static extern int _IAPManager_Purchase(IntPtr instance, string productID);
+		private static extern bool _IAPManager_Purchase(IntPtr instance, string productID);
 		[DllImport("__Internal")]
 		private static extern int _IAPManager_CanMakePurchases(IntPtr instance);
 	#endif
@@ -76,6 +76,16 @@ public class IAPManagerObject : MonoBehaviour {
 		#endif
 	}
 
+	public void CanMakePurchases() {
+		#if UNITY_IPHONE
+		_IAPManager_CanMakePurchases(iap);
+		#elif UNITY_ANDROID
+		iap.Call("Purchase", productID);
+		#elif UNITY_WEBPLAYER
+		Application.ExternalCall("unityIAP.Purchase", productID);
+		#endif
+	}
+	
 	public void Purchase(String productID) {
 		#if UNITY_EDITOR || UNITY_STANDALONE_OSX
 			_IAPManager_Purchase(iap, productID);

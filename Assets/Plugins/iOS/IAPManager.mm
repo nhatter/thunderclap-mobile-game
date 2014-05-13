@@ -195,7 +195,13 @@ void *_IAPManager_Init()
 void _IAPManager_CanMakePurchases(void *instance)
 {
 	IAPManager *iap = (IAPManager *)instance;
-	[iap canMakePurchases];
+    
+	if([iap canMakePurchases]) {
+        const char *gameObj = "Main";
+        const char *methodName = "canMakePurchases";
+        const char *msg = [@"true" cStringUsingEncoding:NSASCIIStringEncoding];
+        UnitySendMessage (gameObj, methodName, msg);
+    }
 }
 
 void _IAPManager_Purchase(void *instance, const char *productID)
