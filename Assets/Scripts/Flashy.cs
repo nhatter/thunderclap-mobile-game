@@ -56,7 +56,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent umbrellaDisplay = new GUIContent();
 
 	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
-	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 350, Screen.width/2 + 150, 850);
+	Rect CENTER_SCREEN = new Rect(25, 100, Screen.width - 50, Screen.height - 25);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
 	Rect TOP_LEFT_SCREEN = new Rect(50, 0, 150, 125);
@@ -272,7 +272,6 @@ public class Flashy : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin = skin;
 
-		//GUILayout.BeginArea(ENTIRE_SCREEN);
 		switch(menuScreenMode) {
 		
 			case MenuScreenMode.CREDITS:
@@ -315,9 +314,13 @@ public class Flashy : MonoBehaviour {
 
 			case MenuScreenMode.MAIN_MENU:
 
-					GUI.BeginGroup(CENTER_SCREEN);
+					GUILayout.BeginArea(CENTER_SCREEN);
+						
+						
+						GUILayout.BeginVertical();
 						GUILayout.Label(thunderclapLogo);
 						GUILayout.Space(25);
+			
 						if(GUILayout.Button("PLAY")) {
 							menuScreenMode = MenuScreenMode.GAME;
 							isTouchReleased = false;
@@ -335,13 +338,12 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("CREDITS")) {
 							menuScreenMode = MenuScreenMode.CREDITS;
 						}
-
-						
-					GUI.EndGroup();
+						GUILayout.EndVertical();
+			
+					GUILayout.EndArea();
 			break;
 		}// End of GUI switch statement
 
-		//GUILayout.EndArea();
 			
 		if(menuScreenMode == MenuScreenMode.GAME) {
 			GUI.Label(TOP_LEFT_SCREEN, counterDisplay);
@@ -426,10 +428,12 @@ public class Flashy : MonoBehaviour {
 						menuScreenMode = MenuScreenMode.MAIN_MENU;
 					}
 
+					GUILayout.EndArea();
 					GUI.enabled = true;
 
 					GUI.skin = facebookSkin;
 					if(showShareDialog) {
+						GUI.Box(ENTIRE_SCREEN, "", "Overlay");
 						GUI.BeginGroup(shareDialogRect, shareDialogBackground);
 
 							GUI.SetNextControlName("fbComment");
@@ -449,11 +453,13 @@ public class Flashy : MonoBehaviour {
 						if(GUI.Button(cancelShareButtonRect, "", "Cancel")) {
 							showShareDialog = false;
 						}
+
+						GUI.enabled = false;
 					}
 					
 					GUI.skin = skin;
 				
-				GUILayout.EndArea();
+
 			} else {
 				if(savedByUmbrella) {
 					GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");

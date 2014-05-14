@@ -56,8 +56,8 @@ public class FacebookIntegration : MonoBehaviour {
 		StartCoroutine(TakeScreenshot(callback));
 	}
 
-	public void shareScreenshot(string comment) {
-		StartCoroutine(UploadScreenshot(comment));
+	public void shareScreenshot(string comment, Action callback) {
+		StartCoroutine(UploadScreenshot(comment, callback));
 	}
 
 	private IEnumerator TakeScreenshot(Action callback) 
