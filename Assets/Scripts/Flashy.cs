@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 public class Flashy : MonoBehaviour {
@@ -66,6 +67,8 @@ public class Flashy : MonoBehaviour {
 
 	string DATA_PATH;
 	string PLAYER_XML_FILE;
+
+	FacebookIntegration fb = new FacebookIntegration();
 
 	// Use this for initialization
 	void Start () {
@@ -135,6 +138,11 @@ public class Flashy : MonoBehaviour {
 							flashTimer = 0;
 							if(dodgeCount > player.bestScore) {
 								player.bestScore = dodgeCount;
+								if (FB.IsLoggedIn) {
+									var query = new Dictionary<string, string>();
+									query["score"] = ""+player.bestScore;
+									FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
+								}   
 							}
 
 							gameOver = true;
@@ -178,6 +186,11 @@ public class Flashy : MonoBehaviour {
 					} else {
 						if(dodgeCount > player.bestScore) {
 							player.bestScore = dodgeCount;
+							if (FB.IsLoggedIn) {
+								var query = new Dictionary<string, string>();
+								query["score"] = ""+player.bestScore;
+								FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
+							}
 						}
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
@@ -288,6 +301,10 @@ public class Flashy : MonoBehaviour {
 							audio.Stop();
 						}
 
+						if(GUILayout.Button("f CONNECT")) {
+							fb.CallFBInit();
+						}
+
 						if(GUILayout.Button("HOW TO PLAY")) {
 							menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
 						}
@@ -295,6 +312,8 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("CREDITS")) {
 							menuScreenMode = MenuScreenMode.CREDITS;
 						}
+
+						
 					GUI.EndGroup();
 			break;
 		}// End of GUI switch statement
