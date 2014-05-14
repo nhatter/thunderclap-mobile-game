@@ -56,7 +56,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent umbrellaDisplay = new GUIContent();
 
 	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
-	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 300, Screen.width/2 + 150, 800);
+	Rect CENTER_SCREEN = new Rect(Screen.width/4 - 75, Screen.height/2 - 350, Screen.width/2 + 150, 850);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
 	Rect TOP_LEFT_SCREEN = new Rect(50, 0, 150, 125);
@@ -70,7 +70,18 @@ public class Flashy : MonoBehaviour {
 	string DATA_PATH;
 	string PLAYER_XML_FILE;
 
-	FacebookIntegration fb = new FacebookIntegration();
+	public GUISkin facebookSkin;
+	FacebookIntegration fb;
+	bool showShareDialog = false;
+	public Texture2D shareDialogBackground;
+	Rect shareButtonRect;
+	Rect shareDialogRect;
+	Rect cancelShareButtonRect;
+	string FB_COMMENT_PLACEHOLDER_TEXT = "Say something about this...";
+	string screenshotComment;
+	Rect screenshotTextAreaRect = new Rect(23, 100, 554, 96);
+	Rect screenshotPreviewRect;
+	float screenRatio = (float) Screen.height / (float) Screen.width;
 
 	// Use this for initialization
 	void Start () {
@@ -97,6 +108,13 @@ public class Flashy : MonoBehaviour {
 		PLAYER_XML_FILE = DATA_PATH + "player.xml";
 		Debug.Log("Player file is stored at :"+ PLAYER_XML_FILE);
 		loadPlayer();
+
+		fb = this.gameObject.AddComponent<FacebookIntegration>();
+		shareButtonRect = new Rect(shareDialogBackground.width - facebookSkin.GetStyle("Share").fixedWidth, 5, facebookSkin.GetStyle("Share").fixedWidth, facebookSkin.GetStyle("Share").fixedHeight);
+		shareDialogRect = new Rect((Screen.width - shareDialogBackground.width)/2, 23, shareDialogBackground.width, shareDialogBackground.height);
+		cancelShareButtonRect = new Rect((Screen.width - shareDialogBackground.width)/2 - 4, 4, facebookSkin.GetStyle("Cancel").fixedWidth, facebookSkin.GetStyle("Cancel").fixedHeight);
+		screenshotComment = FB_COMMENT_PLACEHOLDER_TEXT;
+		screenshotPreviewRect = new Rect (23, 225, 400, 400 * screenRatio);
 	}
 
 	void loadPlayer() {
@@ -332,8 +350,14 @@ public class Flashy : MonoBehaviour {
 			if(gameOver) {
 				GUILayout.BeginArea(CENTER_SCREEN);
 					if(isNewHighScore) {
+
+						  
+					
 						GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
 						GUILayout.Label("OMG.");
+						if(GUILayout.Button("SHARE SCREENSHOT")) {
+							fb.getScreenshot(delegate() { showShareDialog = true; });
+						}
 					} else {
 						GUILayout.Label("GAME OVER");
 						GUILayout.Space(20);
@@ -404,8 +428,30 @@ public class Flashy : MonoBehaviour {
 
 					GUI.enabled = true;
 
+					GUI.skin = facebookSkin;
+					if(showShareDialog) {
+						GUI.BeginGroup(shareDialogRect, shareDialogBackground);
+
+							GUI.SetNextControlName("fbComment");
+							screenshotComment = GUI.TextArea(screenshotTextAreaRect, screenshotComment);
+
+							if(GUI.GetNameOfFocusedControl() == "fbComment" && screenshotComment == FB_COMMENT_PLACEHOLDER_TEXT) {
+								screenshotComment = "";
+							}
+						
+							if(GUI.Button(shareButtonRect, "", "Share")) {
+								fb.shareScreenshot(screenshotComment, delegate() { showShareDialog = false; });
+							}
+
+							GUI.Box(screenshotPreviewRect, fb.sharingScreenshot);
+					    GUI.EndGroup();
+
+						if(GUI.Button(cancelShareButtonRect, "", "Cancel")) {
+							showShareDialog = false;
+						}
+					}
 					
-					
+					GUI.skin = skin;
 				
 				GUILayout.EndArea();
 			} else {

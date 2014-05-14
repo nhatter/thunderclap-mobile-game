@@ -4,11 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class FacebookIntegration {
+public class FacebookIntegration : MonoBehaviour {
 	private string lastResponse = "";
-	#region FB.Init() example
-	
+
 	public bool isInit = false;
+
+	public Texture2D sharingScreenshot;
 	
 	public void CallFBInit()
 	{
@@ -26,10 +27,6 @@ public class FacebookIntegration {
 	{
 		Debug.Log("Is game showing? " + isGameShown);
 	}
-	
-	#endregion
-	
-	#region FB.Login() example
 	
 	public void CallFBLogin()
 	{
@@ -54,5 +51,41 @@ public class FacebookIntegration {
 	{
 		FB.Logout();
 	}
-	#endregion
+
+	public void getScreenshot(Action callback) {
+		StartCoroutine(TakeScreenshot(callback));
+	}
+
+	public void shareScreenshot(string comment) {
+		StartCoroutine(UploadScreenshot(comment));
+	}
+
+	private IEnumerator TakeScreenshot(Action callback) 
+	{
+		yield return new WaitForEndOfFrame();
+
+		sharingScreenshot = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+		// Read screen contents into the texture
+		sharingScreenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+		sharingScreenshot.Apply();
+
+		callback();
+
+		yield return true;
+	}
+
+	private IEnumerator UploadScreenshot(string comment, Action callback) 
+	{
+		byte[] screenshot = sharingScreenshot.EncodeToPNG();
+
+		var wwwForm = new WWWForm();
+		wwwForm.AddBinaryData("image", screenshot, "Screenshot.png");
+		wwwForm.AddField("name", comment);
+		
+		FB.API("me/photos", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result of sharing screenshot: " + r.Text); }, wwwForm);
+
+		callback();
+
+		yield return true;
+	}
 }
