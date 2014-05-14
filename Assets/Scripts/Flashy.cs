@@ -115,6 +115,8 @@ public class Flashy : MonoBehaviour {
 		cancelShareButtonRect = new Rect((Screen.width - shareDialogBackground.width)/2 - 4, 4, facebookSkin.GetStyle("Cancel").fixedWidth, facebookSkin.GetStyle("Cancel").fixedHeight);
 		screenshotComment = FB_COMMENT_PLACEHOLDER_TEXT;
 		screenshotPreviewRect = new Rect (23, 225, 400, 400 * screenRatio);
+
+		fb.CallFBInit();
 	}
 
 	void loadPlayer() {
@@ -327,8 +329,8 @@ public class Flashy : MonoBehaviour {
 							audio.Stop();
 						}
 
-						if(GUILayout.Button("f CONNECT")) {
-							fb.CallFBInit();
+						if(GUILayout.Button("f CONNECT")) {							
+							fb.CallFBLogin();
 						}
 
 						if(GUILayout.Button("HOW TO PLAY")) {
@@ -396,7 +398,11 @@ public class Flashy : MonoBehaviour {
 						}
 
 						if(GUILayout.Button("SHARE SCREENSHOT")) {
-							fb.getScreenshot(delegate() { showShareDialog = true; });
+							if(!FB.IsLoggedIn) {
+								fb.CallFBLogin();
+							} else {
+								fb.getScreenshot(delegate() { showShareDialog = true; });
+							}
 						}
 				
 						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {

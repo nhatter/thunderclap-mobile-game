@@ -20,7 +20,6 @@ public class FacebookIntegration : MonoBehaviour {
 	{
 		Debug.Log("FB.Init completed: Is user logged in? " + FB.IsLoggedIn);
 		isInit = true;
-		CallFBLogin();
 	}
 	
 	public void OnHideUnity(bool isGameShown)
