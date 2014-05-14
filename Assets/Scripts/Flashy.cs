@@ -79,7 +79,7 @@ public class Flashy : MonoBehaviour {
 	Rect cancelShareButtonRect;
 	string FB_COMMENT_PLACEHOLDER_TEXT = "Say something about this...";
 	string screenshotComment;
-	Rect screenshotTextAreaRect = new Rect(23, 100, 554, 96);
+	Rect screenshotTextAreaRect = new Rect(23, 100, 547, 96);
 	Rect screenshotPreviewRect;
 	float screenRatio = (float) Screen.height / (float) Screen.width;
 
@@ -110,7 +110,7 @@ public class Flashy : MonoBehaviour {
 		loadPlayer();
 
 		fb = this.gameObject.AddComponent<FacebookIntegration>();
-		shareButtonRect = new Rect(shareDialogBackground.width - facebookSkin.GetStyle("Share").fixedWidth, 5, facebookSkin.GetStyle("Share").fixedWidth, facebookSkin.GetStyle("Share").fixedHeight);
+		shareButtonRect = new Rect(shareDialogBackground.width - facebookSkin.GetStyle("Share").fixedWidth - 5, 12, facebookSkin.GetStyle("Share").fixedWidth, facebookSkin.GetStyle("Share").fixedHeight);
 		shareDialogRect = new Rect((Screen.width - shareDialogBackground.width)/2, 23, shareDialogBackground.width, shareDialogBackground.height);
 		cancelShareButtonRect = new Rect((Screen.width - shareDialogBackground.width)/2 - 4, 4, facebookSkin.GetStyle("Cancel").fixedWidth, facebookSkin.GetStyle("Cancel").fixedHeight);
 		screenshotComment = FB_COMMENT_PLACEHOLDER_TEXT;
@@ -351,30 +351,28 @@ public class Flashy : MonoBehaviour {
 
 			if(gameOver) {
 				GUILayout.BeginArea(CENTER_SCREEN);
-					if(isNewHighScore) {
-
-						  
-					
-						GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
-						GUILayout.Label("OMG.");
-						if(GUILayout.Button("SHARE SCREENSHOT")) {
-							fb.getScreenshot(delegate() { showShareDialog = true; });
+						
+				
+						if(isNewHighScore) {
+							GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
+							GUILayout.Label("OMG.");
+							
+						} else {
+							GUILayout.Label("GAME OVER");
+							GUILayout.Space(20);
+						
+					   		GUILayout.Label("SCORE: "+dodgeCount);
+							GUILayout.Label("   BEST: "+player.bestScore);
 						}
-					} else {
-						GUILayout.Label("GAME OVER");
-						GUILayout.Space(20);
-					
-				   		GUILayout.Label("SCORE: "+dodgeCount);
-						GUILayout.Label("   BEST: "+player.bestScore);
-					}
-					
 
 						if(isTouchReleased && isShowingGameOverMenu) {
 							GUI.enabled = true;
 						} else {
 							GUI.enabled = false;
 						}
-
+				
+						
+				
 						if(GUILayout.Button("RETRY")) {
 							initFlash();
 
@@ -397,6 +395,10 @@ public class Flashy : MonoBehaviour {
 							Debug.Log("Retry pressed");
 						}
 
+						if(GUILayout.Button("SHARE SCREENSHOT")) {
+							fb.getScreenshot(delegate() { showShareDialog = true; });
+						}
+				
 						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
 							GUI.enabled = true;
 						} else {
