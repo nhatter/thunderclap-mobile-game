@@ -33,6 +33,7 @@ public class Flashy : MonoBehaviour {
 	public AudioClip zapSound;
 	public AudioClip caughtSound;
 	public AudioClip music;
+	public AudioClip highScoreSound;
 
 	float flashTimer;
 	float timeToFlash;
@@ -49,6 +50,7 @@ public class Flashy : MonoBehaviour {
 	public float timeToVibrate = 1.0f;
 
 	int dodgeCount = 0;
+	bool isNewHighScore = false;
 
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
@@ -136,18 +138,11 @@ public class Flashy : MonoBehaviour {
 
 						} else {
 							flashTimer = 0;
-							if(dodgeCount > player.bestScore) {
-								player.bestScore = dodgeCount;
-								if (FB.IsLoggedIn) {
-									var query = new Dictionary<string, string>();
-									query["score"] = ""+player.bestScore;
-									FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
-								}   
-							}
+							checkForHighScore();
 
 							gameOver = true;
 							counterDisplay.text = ""+dodgeCount;
-							audio.PlayOneShot(zapSound);
+
 
 							Debug.Log("Game over by early/late touch");
 						}
@@ -184,17 +179,11 @@ public class Flashy : MonoBehaviour {
 						umbrellaDisplay.text = ""+player.umbrellaCount;
 						isFlashCaught = true;
 					} else {
-						if(dodgeCount > player.bestScore) {
-							player.bestScore = dodgeCount;
-							if (FB.IsLoggedIn) {
-								var query = new Dictionary<string, string>();
-								query["score"] = ""+player.bestScore;
-								FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
-							}
-						}
+						checkForHighScore();
+
 						gameOver = true;
 						counterDisplay.text = ""+dodgeCount;
-						audio.PlayOneShot(zapSound);
+
 						Debug.Log("Missed the flash");
 					}
 				}
@@ -230,7 +219,23 @@ public class Flashy : MonoBehaviour {
 			#endif
 	}
 
-
+	void checkForHighScore() {
+		if(dodgeCount > player.bestScore) {
+			player.bestScore = dodgeCount;
+			isNewHighScore = true;
+			audio.PlayOneShot(highScoreSound);
+			
+			if (FB.IsLoggedIn) {
+				var query = new Dictionary<string, string>();
+				query["score"] = ""+player.bestScore;
+				FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
+			}
+		} else {
+			audio.PlayOneShot(zapSound);
+		}
+	}
+	
+	
 	void calculateTimeToFlash() {
 		timeToFlash = minTimeBetweenFlash + UnityEngine.Random.value*maxTimeBetweenFlash;
 	}
@@ -326,10 +331,16 @@ public class Flashy : MonoBehaviour {
 
 			if(gameOver) {
 				GUILayout.BeginArea(CENTER_SCREEN);
-					GUILayout.Label("GAME OVER");
-					GUILayout.Space(20);
-					GUILayout.Label("SCORE: "+dodgeCount);
-					GUILayout.Label("   BEST: "+player.bestScore);
+					if(isNewHighScore) {
+						GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
+						GUILayout.Label("OMG.");
+					} else {
+						GUILayout.Label("GAME OVER");
+						GUILayout.Space(20);
+					
+				   		GUILayout.Label("SCORE: "+dodgeCount);
+						GUILayout.Label("   BEST: "+player.bestScore);
+					}
 					
 
 						if(isTouchReleased && isShowingGameOverMenu) {
@@ -355,6 +366,7 @@ public class Flashy : MonoBehaviour {
 							gameOver = false;
 							hasSavedGameState = false;
 							isShowingGameOverMenu = false;
+							isNewHighScore = false;	
 						
 							Debug.Log("Retry pressed");
 						}
@@ -435,6 +447,7 @@ public class Flashy : MonoBehaviour {
 				gameOver = false;
 				hasSavedGameState = false;
 				isShowingGameOverMenu = false;
+				isNewHighScore = false;
 			break;
 
 			case "EXTRA_TIME":
