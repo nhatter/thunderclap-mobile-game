@@ -59,8 +59,8 @@ public class Flashy : MonoBehaviour {
 	Rect CENTER_SCREEN = new Rect(25, 100, Screen.width - 50, Screen.height - 25);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
-	Rect TOP_LEFT_SCREEN = new Rect(50, 0, 150, 125);
-	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 150, 0, 150, 125);
+	Rect TOP_LEFT_SCREEN = new Rect(25, 0, 150, 125);
+	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 125, 0, 150, 125);
 
 	IAPManagerObject iap;
 	bool isIAPEnabled = false;
