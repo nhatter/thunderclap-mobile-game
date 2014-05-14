@@ -33,7 +33,7 @@ public class FacebookIntegration {
 	
 	public void CallFBLogin()
 	{
-		FB.Login("email,publish_actions", LoginCallback);
+		FB.Login("public_profile,publish_actions", LoginCallback);
 	}
 	
 	void LoginCallback(FBResult result)
