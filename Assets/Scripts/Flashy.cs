@@ -56,6 +56,10 @@ public class Flashy : MonoBehaviour {
 	public float highScoreTime = 2.0f;
 	public Texture highScoreImage;
 
+	public float keepCalmTime = 3.0f;
+	float keepCalmTimer = 0f;
+	bool keepCalm = false;
+
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
@@ -67,7 +71,12 @@ public class Flashy : MonoBehaviour {
 	Rect TOP_RIGHT_SCREEN = new Rect(Screen.width - 125, 0, 150, 125);
 
 	IAPManagerObject iap;
-	bool isIAPEnabled = false;
+	#if UNITY_EDITOR
+		bool isIAPEnabled = true;
+	#else
+		bool isIAPEnabled = false;
+	#endif
+
 
 	Player player = new Player();
 
@@ -257,6 +266,22 @@ public class Flashy : MonoBehaviour {
 			highScoreTimer += Time.deltaTime;
 		}
 
+		if(keepCalm) {
+			if(keepCalmTimer < keepCalmTime) {
+				keepCalmTimer += Time.deltaTime;
+			} else {
+				keepCalm = false;
+				keepCalmTimer = 0;
+				
+				// Active main game loop
+				gameOver = false;
+				highScoreTimer = 0;
+				hasSavedGameState = false;
+				isShowingGameOverMenu = false;
+				isNewHighScore = false;
+			}
+		}
+
 	}
 
 	void checkForHighScore() {
@@ -425,113 +450,121 @@ public class Flashy : MonoBehaviour {
 			GUI.Label(TOP_LEFT_SCREEN, counterDisplay);
 			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 
-			if(gameOver) {
-				GUILayout.BeginArea(CENTER_SCREEN);
-						
-				
-						if(isNewHighScore) {
-							if(highScoreTimer < highScoreTime) {
-								GUILayout.Box(highScoreImage);
-								GUILayout.Label("NEW HIGH SCORE!");
+			if(keepCalm) {
+				GUI.Label (CENTER_SCREEN_MESSAGE, "KEEP CALM AND CARRY ON\n\nCONTINUE IN "+Mathf.RoundToInt(keepCalmTime - keepCalmTimer)+"...");
+			} else {
+				if(gameOver) {
+					GUILayout.BeginArea(CENTER_SCREEN);
+							
+					
+							if(isNewHighScore) {
+								if(highScoreTimer < highScoreTime) {
+									GUILayout.Box(highScoreImage);
+									GUILayout.Label("NEW HIGH SCORE!");
+								} else {
+									GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
+									GUILayout.Label("OMG.");
+								}
+								
 							} else {
-								GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
-								GUILayout.Label("OMG.");
-							}
+								GUILayout.Label("GAME OVER");
+								GUILayout.Space(20);
 							
-						} else {
-							GUILayout.Label("GAME OVER");
-							GUILayout.Space(20);
-						
-					   		GUILayout.Label("SCORE: "+dodgeCount);
-							GUILayout.Label("   BEST: "+player.bestScore);
-						}
-
-						if(isTouchReleased && isShowingGameOverMenu) {
-							GUI.enabled = true;
-						} else {
-							GUI.enabled = false;
-						}
-				
-						
-					if((isNewHighScore && highScoreTimer > highScoreTime) || !isNewHighScore)  {
-							if(GUILayout.Button("RETRY")) {
-								initFlash();
-
-								// Reset score
-								dodgeCount = 0;
-								counterDisplay.text = ""+dodgeCount;
-
-								// Important: start game loop by assuming button pressed
-								// to avoid false positive
-								isTouchReleased = false;
-
-								savedByUmbrella = false;
-
-								// Active main game loop
-								gameOver = false;
-								highScoreTimer = 0;
-								hasSavedGameState = false;
-								isShowingGameOverMenu = false;
-								isNewHighScore = false;	
-							
-								Debug.Log("Retry pressed");
+						   		GUILayout.Label("SCORE: "+dodgeCount);
+								GUILayout.Label("   BEST: "+player.bestScore);
 							}
 
-							if(GUILayout.Button("SHARE SCREENSHOT")) {
-								shareScreenshot();
+							if(isTouchReleased && isShowingGameOverMenu) {
+								GUI.enabled = true;
+							} else {
+								GUI.enabled = false;
 							}
 					
-							if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+							
+						if((isNewHighScore && highScoreTimer > highScoreTime) || !isNewHighScore)  {
+								if(GUILayout.Button("RETRY")) {
+									initFlash();
+
+									// Reset score
+									dodgeCount = 0;
+									counterDisplay.text = ""+dodgeCount;
+
+									// Important: start game loop by assuming button pressed
+									// to avoid false positive
+									isTouchReleased = false;
+
+									savedByUmbrella = false;
+
+									// Active main game loop
+									gameOver = false;
+									highScoreTimer = 0;
+									hasSavedGameState = false;
+									isShowingGameOverMenu = false;
+									isNewHighScore = false;	
+								
+									Debug.Log("Retry pressed");
+								}
+
+								if(GUILayout.Button("SHARE SCREENSHOT")) {
+									shareScreenshot();
+								}
+						
+								if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+									GUI.enabled = true;
+								} else {
+									GUI.enabled = false;
+								}
+
+								//#if !UNITY_EDITOR
+								if(GUILayout.Button("BUY UMBRELLAS")) {
+									iap.Purchase("3_UMBRELLAS");
+								}
+
+								if(GUILayout.Button("BUY CARRY ON")) {
+									#if UNITY_EDITOR
+										unlockIAP("CARRY_ON");
+									#else
+										iap.Purchase("CARRY_ON");
+									#endif
+								}
+
+								if(GUILayout.Button("BUY MORE TIME")) {
+									iap.Purchase("MORE_TIME");
+								}
+
+								//#endif
+
+							if(isTouchReleased && isShowingGameOverMenu) {
 								GUI.enabled = true;
 							} else {
 								GUI.enabled = false;
 							}
 
-							#if !UNITY_EDITOR
-							if(GUILayout.Button("BUY UMBRELLAS")) {
-								iap.Purchase("3_UMBRELLAS");
+							if(GUILayout.Button("MAIN MENU")) {
+								menuScreenMode = MenuScreenMode.MAIN_MENU;
 							}
-
-							if(GUILayout.Button("BUY CARRY ON")) {
-								iap.Purchase("CARRY_ON");
-							}
-
-							if(GUILayout.Button("BUY MORE TIME")) {
-								iap.Purchase("MORE_TIME");
-							}
-
-							#endif
-
-						if(isTouchReleased && isShowingGameOverMenu) {
-							GUI.enabled = true;
-						} else {
-							GUI.enabled = false;
 						}
 
-						if(GUILayout.Button("MAIN MENU")) {
-							menuScreenMode = MenuScreenMode.MAIN_MENU;
-						}
-					}
-
-					GUILayout.EndArea();
-					GUI.enabled = true;
-			} else {
-				if(savedByUmbrella) {
-					GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
+						GUILayout.EndArea();
+						GUI.enabled = true;
 				} else {
-					if(dodgeCount == 0) {
-						GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
-					}
+					if(savedByUmbrella) {
+						GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
+					} else {
+						if(dodgeCount == 0) {
+							GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
+						}
 
-					if(dodgeCount == 1) {
-						GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
-					}
+						if(dodgeCount == 1) {
+							GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
+						}
 
-					if(dodgeCount%5 == 0 && dodgeCount != 0) {
-						GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+						if(dodgeCount%5 == 0 && dodgeCount != 0) {
+							GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+						}
 					}
-				}
-			}// End of gameover check
+				}// End of gameover check
+			}// End of keep calm check
 		}// End of main game UI check
 
 
@@ -587,13 +620,8 @@ public class Flashy : MonoBehaviour {
 				isTouchReleased = false;
 				
 				savedByUmbrella = false;
-				
-				// Active main game loop
-				gameOver = false;
-				highScoreTimer = 0;
-				hasSavedGameState = false;
-				isShowingGameOverMenu = false;
-				isNewHighScore = false;
+
+				keepCalm = true;
 			break;
 
 			case "EXTRA_TIME":
