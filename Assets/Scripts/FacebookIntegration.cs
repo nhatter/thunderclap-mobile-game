@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using SimpleJSON;
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,8 @@ public class FacebookIntegration : MonoBehaviour {
 	public bool isInit = false;
 
 	public Texture2D sharingScreenshot;
+
+	public Dictionary<string, int> friendScores = new Dictionary<string, int>();
 	
 	public void CallFBInit()
 	{
@@ -86,5 +90,31 @@ public class FacebookIntegration : MonoBehaviour {
 		callback();
 
 		yield return true;
+	}
+
+	public void readFriendScores()
+	{
+		var wwwForm = new WWWForm();
+		wwwForm.AddField("access_token", FB.AccessToken);
+
+		FB.API("/"+FB.AppId+"/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.GET, onAppScoresRead, wwwForm);
+	}
+
+	private void onAppScoresRead(FBResult result)
+	{
+		friendScores = new Dictionary<string, int>();
+
+		if (result != null)
+		{
+			Debug.Log(result.Text);
+			var playerScores = JSONNode.Parse(result.Text)["data"]; 
+
+			for(int i=0; i<playerScores.Count; i++)
+			{
+				if(playerScores[i]["user"]["name"] != null) {
+					friendScores.Add(playerScores[i]["user"]["name"], playerScores[i]["score"].AsInt);
+				}
+			}
+		}
 	}
 }

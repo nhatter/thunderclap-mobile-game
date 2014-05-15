@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 public class Flashy : MonoBehaviour {
-	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME};
+	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME, FRIEND_SCORES};
 	public MenuScreenMode menuScreenMode = MenuScreenMode.HEALTH_WARNING;
 
 	public GUISkin skin;
@@ -287,6 +287,25 @@ public class Flashy : MonoBehaviour {
 		GUI.skin = skin;
 
 		switch(menuScreenMode) {
+
+			case MenuScreenMode.FRIEND_SCORES:
+				GUILayout.Label("YOUR FRIENDS' SCORES");
+				GUILayout.Space(10);
+				foreach(KeyValuePair<string, int> friendScore in fb.friendScores) {
+					GUILayout.BeginHorizontal();
+						GUILayout.Label(friendScore.Key, GUILayout.Width(450));
+						GUILayout.Label(""+friendScore.Value, GUILayout.Width(80));
+	                GUILayout.EndHorizontal();
+				}
+
+				if(GUILayout.Button("SHARE SCREENSHOT")) {
+					shareScreenshot();
+				}
+
+				if(GUILayout.Button("MAIN MENU")) {
+					menuScreenMode = MenuScreenMode.MAIN_MENU;
+				}
+			break;
 		
 			case MenuScreenMode.CREDITS:
 				if(GUILayout.Button("BACK")) {
@@ -359,6 +378,11 @@ public class Flashy : MonoBehaviour {
 							fb.CallFBLogin();
 						}
 
+						if(GUILayout.Button("FRIENDS' SCORES")) {							
+							fb.readFriendScores();
+							menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+						}
+			
 						if(GUILayout.Button("HOW TO PLAY")) {
 							menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
 						}
@@ -424,11 +448,7 @@ public class Flashy : MonoBehaviour {
 						}
 
 						if(GUILayout.Button("SHARE SCREENSHOT")) {
-							if(!FB.IsLoggedIn) {
-								fb.CallFBLogin();
-							}
-
-							fb.getScreenshot(delegate() { showShareDialog = true; });
+							shareScreenshot();
 						}
 				
 						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
@@ -464,36 +484,6 @@ public class Flashy : MonoBehaviour {
 
 					GUILayout.EndArea();
 					GUI.enabled = true;
-
-					GUI.skin = facebookSkin;
-					if(showShareDialog) {
-						GUI.Box(ENTIRE_SCREEN, "", "Overlay");
-						GUI.BeginGroup(shareDialogRect, shareDialogBackground);
-
-							GUI.SetNextControlName("fbComment");
-							screenshotComment = GUI.TextArea(screenshotTextAreaRect, screenshotComment);
-
-							if(GUI.GetNameOfFocusedControl() == "fbComment" && screenshotComment == FB_COMMENT_PLACEHOLDER_TEXT) {
-								screenshotComment = "";
-							}
-						
-							if(GUI.Button(shareButtonRect, "", "Share")) {
-								fb.shareScreenshot(screenshotComment, delegate() { showShareDialog = false; });
-							}
-
-							GUI.Box(screenshotPreviewRect, fb.sharingScreenshot);
-					    GUI.EndGroup();
-
-						if(GUI.Button(cancelShareButtonRect, "", "Cancel")) {
-							showShareDialog = false;
-						}
-
-						GUI.enabled = false;
-					}
-					
-					GUI.skin = skin;
-				
-
 			} else {
 				if(savedByUmbrella) {
 					GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
@@ -510,8 +500,46 @@ public class Flashy : MonoBehaviour {
 						GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
 					}
 				}
+			}// End of gameover check
+		}// End of main game UI check
+
+
+		GUI.skin = facebookSkin;
+		if(showShareDialog) {
+			GUI.Box(ENTIRE_SCREEN, "", "Overlay");
+			GUI.BeginGroup(shareDialogRect, shareDialogBackground);
+			
+			GUI.SetNextControlName("fbComment");
+			screenshotComment = GUI.TextArea(screenshotTextAreaRect, screenshotComment);
+			
+			if(GUI.GetNameOfFocusedControl() == "fbComment" && screenshotComment == FB_COMMENT_PLACEHOLDER_TEXT) {
+				screenshotComment = "";
 			}
+			
+			if(GUI.Button(shareButtonRect, "", "Share")) {
+				fb.shareScreenshot(screenshotComment, delegate() { showShareDialog = false; });
+			}
+			
+			GUI.Box(screenshotPreviewRect, fb.sharingScreenshot);
+			GUI.EndGroup();
+			
+			if(GUI.Button(cancelShareButtonRect, "", "Cancel")) {
+				showShareDialog = false;
+			}
+			
+			GUI.enabled = false;
 		}
+		
+		GUI.skin = skin;
+
+	}
+
+	void shareScreenshot() {
+		if(!FB.IsLoggedIn) {
+			fb.CallFBLogin();
+		}
+		
+		fb.getScreenshot(delegate() { showShareDialog = true; });
 	}
 
 	public void unlockIAP(string productID) {
