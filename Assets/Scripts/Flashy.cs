@@ -52,6 +52,9 @@ public class Flashy : MonoBehaviour {
 
 	int dodgeCount = 0;
 	bool isNewHighScore = false;
+	float highScoreTimer = 0;
+	public float highScoreTime = 2.0f;
+	public Texture highScoreImage;
 
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
@@ -250,6 +253,10 @@ public class Flashy : MonoBehaviour {
 			}
 		}
 
+		if(isNewHighScore && highScoreTimer < highScoreTime) {
+			highScoreTimer += Time.deltaTime;
+		}
+
 	}
 
 	void checkForHighScore() {
@@ -423,8 +430,13 @@ public class Flashy : MonoBehaviour {
 						
 				
 						if(isNewHighScore) {
-							GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
-							GUILayout.Label("OMG.");
+							if(highScoreTimer < highScoreTime) {
+								GUILayout.Box(highScoreImage);
+								GUILayout.Label("NEW HIGH SCORE!");
+							} else {
+								GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
+								GUILayout.Label("OMG.");
+							}
 							
 						} else {
 							GUILayout.Label("GAME OVER");
@@ -441,62 +453,64 @@ public class Flashy : MonoBehaviour {
 						}
 				
 						
-				
-						if(GUILayout.Button("RETRY")) {
-							initFlash();
+					if((isNewHighScore && highScoreTimer > highScoreTime) || !isNewHighScore)  {
+							if(GUILayout.Button("RETRY")) {
+								initFlash();
 
-							// Reset score
-							dodgeCount = 0;
-							counterDisplay.text = ""+dodgeCount;
+								// Reset score
+								dodgeCount = 0;
+								counterDisplay.text = ""+dodgeCount;
 
-							// Important: start game loop by assuming button pressed
-							// to avoid false positive
-							isTouchReleased = false;
+								// Important: start game loop by assuming button pressed
+								// to avoid false positive
+								isTouchReleased = false;
 
-							savedByUmbrella = false;
+								savedByUmbrella = false;
 
-							// Active main game loop
-							gameOver = false;
-							hasSavedGameState = false;
-							isShowingGameOverMenu = false;
-							isNewHighScore = false;	
-						
-							Debug.Log("Retry pressed");
-						}
+								// Active main game loop
+								gameOver = false;
+								highScoreTimer = 0;
+								hasSavedGameState = false;
+								isShowingGameOverMenu = false;
+								isNewHighScore = false;	
+							
+								Debug.Log("Retry pressed");
+							}
 
-						if(GUILayout.Button("SHARE SCREENSHOT")) {
-							shareScreenshot();
-						}
-				
-						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+							if(GUILayout.Button("SHARE SCREENSHOT")) {
+								shareScreenshot();
+							}
+					
+							if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {
+								GUI.enabled = true;
+							} else {
+								GUI.enabled = false;
+							}
+
+							#if !UNITY_EDITOR
+							if(GUILayout.Button("BUY UMBRELLAS")) {
+								iap.Purchase("3_UMBRELLAS");
+							}
+
+							if(GUILayout.Button("BUY CARRY ON")) {
+								iap.Purchase("CARRY_ON");
+							}
+
+							if(GUILayout.Button("BUY MORE TIME")) {
+								iap.Purchase("MORE_TIME");
+							}
+
+							#endif
+
+						if(isTouchReleased && isShowingGameOverMenu) {
 							GUI.enabled = true;
 						} else {
 							GUI.enabled = false;
 						}
 
-						#if !UNITY_EDITOR
-						if(GUILayout.Button("BUY UMBRELLAS")) {
-							iap.Purchase("3_UMBRELLAS");
+						if(GUILayout.Button("MAIN MENU")) {
+							menuScreenMode = MenuScreenMode.MAIN_MENU;
 						}
-
-						if(GUILayout.Button("BUY CARRY ON")) {
-							iap.Purchase("CARRY_ON");
-						}
-
-						if(GUILayout.Button("BUY MORE TIME")) {
-							iap.Purchase("MORE_TIME");
-						}
-
-						#endif
-
-					if(isTouchReleased && isShowingGameOverMenu) {
-						GUI.enabled = true;
-					} else {
-						GUI.enabled = false;
-					}
-
-					if(GUILayout.Button("MAIN MENU")) {
-						menuScreenMode = MenuScreenMode.MAIN_MENU;
 					}
 
 					GUILayout.EndArea();
@@ -576,6 +590,7 @@ public class Flashy : MonoBehaviour {
 				
 				// Active main game loop
 				gameOver = false;
+				highScoreTimer = 0;
 				hasSavedGameState = false;
 				isShowingGameOverMenu = false;
 				isNewHighScore = false;
