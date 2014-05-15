@@ -9,6 +9,7 @@ public class Flashy : MonoBehaviour {
 	public MenuScreenMode menuScreenMode = MenuScreenMode.HEALTH_WARNING;
 
 	public GUISkin skin;
+	public GUISkin creditsSkin;
 	public Texture2D flashTexture;
 
 	public bool isTutorialMode = false;
@@ -82,6 +83,8 @@ public class Flashy : MonoBehaviour {
 	Rect screenshotTextAreaRect = new Rect(23, 100, 547, 96);
 	Rect screenshotPreviewRect;
 	float screenRatio = (float) Screen.height / (float) Screen.width;
+
+	Vector2 creditScrollPosition = new Vector2(0,0);
 
 	// Use this for initialization
 	void Start () {
@@ -237,6 +240,15 @@ public class Flashy : MonoBehaviour {
 				isTouchReleased = true;
 			}
 			#endif
+
+		if(menuScreenMode == MenuScreenMode.CREDITS) {
+			if(Input.touchCount > 0) {
+				if(Input.GetTouch(0).phase == TouchPhase.Moved) {
+					creditScrollPosition = new Vector2(creditScrollPosition.x, creditScrollPosition.y + Input.GetTouch(0).deltaPosition.y);
+				}
+			}
+		}
+
 	}
 
 	void checkForHighScore() {
@@ -281,20 +293,34 @@ public class Flashy : MonoBehaviour {
 					menuScreenMode = MenuScreenMode.MAIN_MENU;
 				}
 
-				GUILayout.BeginVertical();
+				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true);
+					GUI.skin = creditsSkin;
 
-				GUILayout.Space(20);
-				GUILayout.Label ("\"Woo-sh\" GAME OVER SOUND");
-				GUILayout.Label ("woosh_02.wav by Glaneur de sons (http://www.freesound.org/people/Glaneur%20de%20sons/sounds/34172/)");
-				GUILayout.Label ("Licensed under Creative Commons Share Alike 3.0 (http://creativecommons.org/licenses/by/3.0/)");
-				GUILayout.Space(20);
-				GUILayout.Label("SPECIAL THANKS");
-				GUILayout.Label("Adam James (Meownoodle on YouTube)");
-				GUILayout.Label("Robert Streeting (robsws.co.uk)");
-				GUILayout.Label("Charles Payne (business-aspirations.com)");
-				GUILayout.Label("Mark Salvin (marksalvin.com)");
-				GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
-				GUILayout.EndVertical();
+					GUILayout.BeginVertical();
+					
+					GUILayout.Box (thunderclapLogo);
+					GUILayout.Label("BY GAMER DEVELOPER EXCHANGE", GUILayout.Width(Screen.width));
+					GUILayout.Space(10);
+					GUILayout.Label("LEAD PROGRAMMER AND DESIGNER\nNick Hatter\nCEO of giftgaming.com and gamerdevx.com", GUILayout.Width(Screen.width));
+					GUILayout.Space(10);
+					GUILayout.Label("SPECIAL THANKS");
+					GUILayout.Label("Adam James (Meownoodle on YouTube)");
+					GUILayout.Label("Robert Streeting (robsws.co.uk)");
+					GUILayout.Label("Charles Payne (business-aspirations.com)");
+					GUILayout.Label("Mark Salvin (marksalvin.com)");
+					GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
+
+					GUILayout.Label("MUSIC\n\"Cut and Run\" by Kevin MacLeod (incompetech.com)\nLicensed under Creative Commons: By Attribution 3.0\nhttp://creativecommons.org/licenses/by/3.0/");
+					GUILayout.Label ("GAME OVER SOUND\nwoosh_02.wav by Glaneur de sons (http://www.freesound.org/people/Glaneur%20de%20sons/sounds/34172/)\n\nLicensed under Creative Commons Share Alike 3.0\nhttp://creativecommons.org/licenses/by/3.0/");
+					GUILayout.Label("FONTS\n\"Oswald\" by Vernon Adams (vern@newtypography.co.uk)\nLicensed under SIL OPEN FONT LICENSE Version 1.1\nhttp://scripts.sil.org/OFL\n\n" + 
+			                				"\"Open Sans\" by Steve Matteson\nLicensed under the Apache License, Version 2.0\nhttp://www.apache.org/licenses/LICENSE-2.0");
+				
+					GUILayout.EndVertical();
+
+					GUI.skin = skin;
+				GUILayout.EndScrollView();
+
+
 			break;
 		
 			case MenuScreenMode.HEALTH_WARNING:
@@ -400,9 +426,9 @@ public class Flashy : MonoBehaviour {
 						if(GUILayout.Button("SHARE SCREENSHOT")) {
 							if(!FB.IsLoggedIn) {
 								fb.CallFBLogin();
-							} else {
-								fb.getScreenshot(delegate() { showShareDialog = true; });
 							}
+
+							fb.getScreenshot(delegate() { showShareDialog = true; });
 						}
 				
 						if(isTouchReleased && isShowingGameOverMenu && isIAPEnabled) {

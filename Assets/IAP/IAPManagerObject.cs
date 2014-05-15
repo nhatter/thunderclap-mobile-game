@@ -33,15 +33,15 @@ public class IAPManagerObject : MonoBehaviour {
 	#elif UNITY_WEBPLAYER
 	#endif
 	
-	public bool IsKeyboardVisible {
-		get {
-			#if UNITY_ANDROID && !UNITY_EDITOR
-				return mIAPManager;
-			#else
-				return TouchScreenKeyboard.visible;
-			#endif
-		}
-	}
+//	public bool IsKeyboardVisible {
+//		get {
+//			#if UNITY_ANDROID && !UNITY_EDITOR
+//				return mIAPManager;
+//			#else
+//				return TouchScreenKeyboard.visible;
+//			#endif
+//		}
+//	}
 
 	#if UNITY_EDITOR || UNITY_STANDALONE_OSX
 		[DllImport("IAPManager")]
@@ -69,8 +69,8 @@ public class IAPManagerObject : MonoBehaviour {
 		#elif UNITY_IPHONE
 			iap = _IAPManager_Init();
 		#elif UNITY_ANDROID
-			iap = new AndroidJavaObject("com.giftgaming.IAPManager");
-			iap.Call("Init", name);
+		//	iap = new AndroidJavaObject("com.giftgaming.IAPManager");
+		//	iap.Call("Init", name);
 		#elif UNITY_WEBPLAYER
 			Application.ExternalCall("unityIAP.init", name);
 		#endif
@@ -80,7 +80,7 @@ public class IAPManagerObject : MonoBehaviour {
 		#if UNITY_IPHONE
 		_IAPManager_CanMakePurchases(iap);
 		#elif UNITY_ANDROID
-		iap.Call("Purchase", productID);
+		//iap.Call("Purchase", productID);
 		#elif UNITY_WEBPLAYER
 		Application.ExternalCall("unityIAP.Purchase", productID);
 		#endif
@@ -92,7 +92,7 @@ public class IAPManagerObject : MonoBehaviour {
 		#elif UNITY_IPHONE
 			_IAPManager_Purchase(iap, productID);
 		#elif UNITY_ANDROID
-			iap.Call("Purchase", productID);
+		//	iap.Call("Purchase", productID);
 		#elif UNITY_WEBPLAYER
 			Application.ExternalCall("unityIAP.Purchase", productID);
 		#endif
@@ -108,9 +108,9 @@ public class IAPManagerObject : MonoBehaviour {
 				return;
 			_IAPManager_Destroy(iap);
 		#elif UNITY_ANDROID
-			if (iap == null)
-				return;
-			iap.Call("Destroy");
+		//	if (iap == null)
+		//		return;
+		//	iap.Call("Destroy");
 		#elif UNITY_WEBPLAYER
 			Application.ExternalCall("unityIAP.destroy", name);
 		#endif
