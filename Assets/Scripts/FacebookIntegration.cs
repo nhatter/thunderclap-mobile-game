@@ -5,6 +5,8 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Facebook.MiniJSON;
+
 
 public class FacebookIntegration : MonoBehaviour {
 	private string lastResponse = "";
@@ -14,6 +16,11 @@ public class FacebookIntegration : MonoBehaviour {
 	public Texture2D sharingScreenshot;
 
 	public Dictionary<string, int> friendScores = new Dictionary<string, int>();
+
+	public List<object>                 scores          = null;
+	public Dictionary<string, Texture>  friendImages    = new Dictionary<string, Texture>();
+
+	public Player player;
 	
 	public void CallFBInit()
 	{
@@ -92,29 +99,94 @@ public class FacebookIntegration : MonoBehaviour {
 		yield return true;
 	}
 
-	public void readFriendScores()
+	public void QueryScores()
 	{
-		var wwwForm = new WWWForm();
-		wwwForm.AddField("access_token", FB.AccessToken);
-
-		FB.API("/"+FB.AppId+"/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.GET, onAppScoresRead, wwwForm);
+		FB.API("/app/scores?fields=score,user.limit(20)", Facebook.HttpMethod.GET, ScoresCallback);
 	}
 
-	private void onAppScoresRead(FBResult result)
+	void ScoresCallback(FBResult result) 
 	{
-		friendScores = new Dictionary<string, int>();
-
-		if (result != null)
+		if (result.Error != null)
 		{
-			Debug.Log(result.Text);
-			var playerScores = JSONNode.Parse(result.Text)["data"]; 
+			Debug.Log(result.Error);
+			return;
+		}
+		
+		scores = new List<object>();
+		List<object> scoresList = Util.DeserializeScores(result.Text);
+		
+		foreach(object score in scoresList) 
+		{
+			var entry = (Dictionary<string,object>) score;
+			var user = (Dictionary<string,object>) entry["user"];
+			
+			string userId = (string)user["id"];
 
-			for(int i=0; i<playerScores.Count; i++)
+			int playerHighScore = getScoreFromEntry(entry);
+			Util.Log("Local players score on server is " + playerHighScore);
+			if (playerHighScore < player.bestScore)
 			{
-				if(playerScores[i]["user"]["name"] != null) {
-					friendScores.Add(playerScores[i]["user"]["name"], playerScores[i]["score"].AsInt);
-				}
+				Util.Log("Locally overriding with just acquired score: " + player.bestScore);
+				playerHighScore = player.bestScore;
+			}
+			
+			entry["score"] = playerHighScore.ToString();
+
+			scores.Add(entry);
+			if (!friendImages.ContainsKey(userId))
+			{
+				// We don't have this players image yet, request it now
+				LoadPicture(Util.GetPictureURL(userId, 128, 128),pictureTexture =>
+				            {
+					if (pictureTexture != null)
+					{
+						friendImages.Add(userId, pictureTexture);
+					}
+				});
 			}
 		}
+		
+		// Now sort the entries based on score
+		scores.Sort(delegate(object firstObj,
+		                     object secondObj)
+		            {
+			return -getScoreFromEntry(firstObj).CompareTo(getScoreFromEntry(secondObj));
+		}
+		);
+	}
+
+	private int getScoreFromEntry(object obj)
+	{
+		Dictionary<string,object> entry = (Dictionary<string,object>) obj;
+		return Convert.ToInt32(entry["score"]);
+	}
+
+	public static void FriendPictureCallback(Texture texture)
+	{
+
+	}
+	
+	delegate void LoadPictureCallback (Texture texture);
+
+	IEnumerator LoadPictureEnumerator(string url, LoadPictureCallback callback)    
+	{
+		WWW www = new WWW(url);
+		yield return www;
+		callback(www.texture);
+	}
+	void LoadPicture (string url, LoadPictureCallback callback)
+	{
+		FB.API(url,Facebook.HttpMethod.GET,result =>
+		       {
+			if (result.Error != null)
+			{
+				Debug.Log(result.Error);
+				return;
+			}
+			
+			var imageUrl = Util.DeserializePictureURLString(result.Text);
+			
+			StartCoroutine(LoadPictureEnumerator(imageUrl,callback));
+		});
 	}
 }

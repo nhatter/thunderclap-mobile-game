@@ -120,6 +120,7 @@ public class Flashy : MonoBehaviour {
 		screenshotPreviewRect = new Rect (23, 225, 400, 400 * screenRatio);
 
 		fb.CallFBInit();
+		fb.player = player;
 	}
 
 	void loadPlayer() {
@@ -283,6 +284,8 @@ public class Flashy : MonoBehaviour {
 		calculateTimeToFlash();
 	}
 
+	Texture friendImage;
+
 	void OnGUI() {
 		GUI.skin = skin;
 
@@ -291,11 +294,22 @@ public class Flashy : MonoBehaviour {
 			case MenuScreenMode.FRIEND_SCORES:
 				GUILayout.Label("YOUR FRIENDS' SCORES");
 				GUILayout.Space(10);
-				foreach(KeyValuePair<string, int> friendScore in fb.friendScores) {
-					GUILayout.BeginHorizontal();
-						GUILayout.Label(friendScore.Key, GUILayout.Width(450));
-						GUILayout.Label(""+friendScore.Value, GUILayout.Width(80));
-	                GUILayout.EndHorizontal();
+
+				if(fb.scores != null) {
+					foreach(object score in fb.scores) {
+						var friendScore = (Dictionary<string, object>) score;
+						var user = (Dictionary<string, object>) friendScore["user"];
+						
+						GUILayout.BeginHorizontal();
+							if(fb.friendImages.TryGetValue(""+user["id"], out friendImage)) {
+								GUILayout.Label(friendImage, GUILayout.Width(75));
+								GUILayout.Label(""+user["name"], GUILayout.Width(400));
+								GUILayout.Label(""+friendScore["score"], GUILayout.Width(80));
+							}
+		                GUILayout.EndHorizontal();
+					}
+				} else {
+					GUILayout.Label("RETICULATING SPLINES ETC...");
 				}
 
 				if(GUILayout.Button("SHARE SCREENSHOT")) {
@@ -379,7 +393,7 @@ public class Flashy : MonoBehaviour {
 						}
 
 						if(GUILayout.Button("FRIENDS' SCORES")) {							
-							fb.readFriendScores();
+							fb.QueryScores();
 							menuScreenMode = MenuScreenMode.FRIEND_SCORES;
 						}
 			
