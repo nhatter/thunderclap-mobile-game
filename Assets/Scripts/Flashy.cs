@@ -292,9 +292,10 @@ public class Flashy : MonoBehaviour {
 		switch(menuScreenMode) {
 
 			case MenuScreenMode.FRIEND_SCORES:
-				GUILayout.Label("YOUR FRIENDS' SCORES");
+				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
+				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true);
 				if(fb.scores != null) {
 					foreach(object score in fb.scores) {
 						var friendScore = (Dictionary<string, object>) score;
@@ -311,6 +312,8 @@ public class Flashy : MonoBehaviour {
 				} else {
 					GUILayout.Label("RETICULATING SPLINES ETC...");
 				}
+
+				GUILayout.EndScrollView();
 
 				if(GUILayout.Button("SHARE SCREENSHOT")) {
 					shareScreenshot();
