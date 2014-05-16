@@ -125,6 +125,7 @@ public class FacebookIntegration : MonoBehaviour {
 			var user = (Dictionary<string,object>) entry["user"];
 			
 			string userId = (string)user["id"];
+			Debug.Log("Player score: "+entry["score"]);
 			scores.Add(entry);
 			if (!friendImages.ContainsKey(userId))
 			{

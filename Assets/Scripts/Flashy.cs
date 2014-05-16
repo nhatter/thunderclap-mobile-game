@@ -328,14 +328,14 @@ public class Flashy : MonoBehaviour {
 			player.bestScore = dodgeCount;
 			isNewHighScore = true;
 			audio.PlayOneShot(highScoreSound);
-			
-			if (FB.IsLoggedIn) {
-				var query = new Dictionary<string, string>();
-				query["score"] = ""+player.bestScore;
-				FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
-			}
 		} else {
 			audio.PlayOneShot(zapSound);
+		}
+
+		if (FB.IsLoggedIn) {
+			var query = new Dictionary<string, string>();
+			query["score"] = ""+player.bestScore;
+			FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
 		}
 	}
 	
@@ -550,8 +550,12 @@ public class Flashy : MonoBehaviour {
 							if(!FB.IsLoggedIn) {
 								fb.CallFBLogin();
 							} else {
-								fb.QueryScores();
-								menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+								var query = new Dictionary<string, string>();
+								query["score"] = ""+player.bestScore;
+								FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { 
+									fb.QueryScores();
+									menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+								}, query);
 							}
 						}
 			
