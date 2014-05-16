@@ -121,17 +121,6 @@ public class FacebookIntegration : MonoBehaviour {
 			var user = (Dictionary<string,object>) entry["user"];
 			
 			string userId = (string)user["id"];
-
-			int playerHighScore = getScoreFromEntry(entry);
-			Util.Log("Local players score on server is " + playerHighScore);
-			if (playerHighScore < player.bestScore)
-			{
-				Util.Log("Locally overriding with just acquired score: " + player.bestScore);
-				playerHighScore = player.bestScore;
-			}
-			
-			entry["score"] = playerHighScore.ToString();
-
 			scores.Add(entry);
 			if (!friendImages.ContainsKey(userId))
 			{
