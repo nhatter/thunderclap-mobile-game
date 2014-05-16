@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 
 public class Flashy : MonoBehaviour {
-	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME, FRIEND_SCORES};
+	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME, FRIEND_SCORES, LEVEL_SELECT};
 	public MenuScreenMode menuScreenMode = MenuScreenMode.HEALTH_WARNING;
+	public int POINTS_TO_PASS_LEVEL = 10;
 
 	public GUISkin skin;
 	public GUISkin creditsSkin;
@@ -46,11 +47,16 @@ public class Flashy : MonoBehaviour {
 	bool hasSavedGameState = false;
 	bool savedByUmbrella = false;
 	bool isVibrating = false;
+	bool isTraining = false;
 
 	float vibrateTimer = 0;
 	public float timeToVibrate = 1.0f;
 
 	int dodgeCount = 0;
+	int attemptingLevel = 0;
+	bool levelPassed = false;
+	float levelPassedTimer = 0;
+	public float levelPassedTime = 3.0f;
 	bool isNewHighScore = false;
 	float highScoreTimer = 0;
 	public float highScoreTime = 2.0f;
@@ -169,7 +175,16 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if(isTraining && dodgeCount >= POINTS_TO_PASS_LEVEL && !levelPassed) {
+			if(player.level < attemptingLevel) {
+				player.level = attemptingLevel;
+			}
+
+			levelPassed = true;
+		}
+
 		if(!gameOver && menuScreenMode == MenuScreenMode.GAME) {
+
 			// Now, assuming it isn't game over...
 			if(!isFadingIn && !isFlashCaught && !gameOver) {
 				if(flashTimer > timeToFlash) {
@@ -293,10 +308,23 @@ public class Flashy : MonoBehaviour {
 			}
 		}
 
+		if(levelPassed) {
+			if(levelPassedTimer < levelPassedTime) {
+				levelPassedTimer += Time.deltaTime;
+			}
+
+			if(levelPassedTimer > levelPassedTime) {
+				levelPassed = false;
+				savePlayer();
+				menuScreenMode = MenuScreenMode.LEVEL_SELECT;
+				levelPassedTimer = 0;
+			}
+		}
+
 	}
 
 	void checkForHighScore() {
-		if(dodgeCount > player.bestScore) {
+		if(dodgeCount > player.bestScore && !isTraining) {
 			player.bestScore = dodgeCount;
 			isNewHighScore = true;
 			audio.PlayOneShot(highScoreSound);
@@ -333,6 +361,69 @@ public class Flashy : MonoBehaviour {
 		GUI.skin = skin;
 
 		switch(menuScreenMode) {
+			case MenuScreenMode.LEVEL_SELECT:
+					
+					GUILayout.BeginArea(CENTER_SCREEN);
+					GUI.enabled = true;
+					
+					if(GUILayout.Button("PLAY VS. FRIENDS")) {
+						isTraining = false;
+						flashOutTime = 0.3f;
+						menuScreenMode = MenuScreenMode.GAME;
+						isTouchReleased = false;
+						audio.Stop();
+						levelPassed = false;
+					}
+
+					GUILayout.Space (40);
+					GUILayout.Label("TRAINING");
+					GUILayout.Label("(10 PTS TO PASS)");
+
+					if(GUILayout.Button("LEVEL 0 (EASY)")) {
+						attemptingLevel = 1;
+						isTraining = true;
+						flashOutTime = 0.6f;
+						menuScreenMode = MenuScreenMode.GAME;
+						isTouchReleased = false;
+						audio.Stop();
+						levelPassed = false;
+						dodgeCount = 0;
+					}
+
+					GUI.enabled = (player.level > 0);
+
+					if(GUILayout.Button("LEVEL 1 (MED)")) {
+						attemptingLevel = 2;
+						isTraining = true;
+						flashOutTime = 0.5f;
+						menuScreenMode = MenuScreenMode.GAME;
+						isTouchReleased = false;
+						audio.Stop();
+						levelPassed = false;
+						dodgeCount = 0;
+					}
+
+					GUI.enabled = (player.level > 1);
+
+					if(GUILayout.Button("LEVEL 2 (HARD)")) {
+						attemptingLevel = 3;
+						isTraining = true;
+						flashOutTime = 0.4f;
+						menuScreenMode = MenuScreenMode.GAME;
+						isTouchReleased = false;
+						audio.Stop();
+						levelPassed = false;
+						dodgeCount = 0;
+					}
+
+					GUILayout.Space(40);
+
+					if(GUILayout.Button("MAIN MENU", GUILayout.Width(Screen.width))) {
+						menuScreenMode = MenuScreenMode.MAIN_MENU;
+					}
+
+					GUILayout.EndArea();
+			break;
 
 			case MenuScreenMode.FRIEND_SCORES:
 				GUILayout.Label("FRIENDS' SCORES");
@@ -442,9 +533,7 @@ public class Flashy : MonoBehaviour {
 						GUILayout.Space(25);
 			
 						if(GUILayout.Button("PLAY")) {
-							menuScreenMode = MenuScreenMode.GAME;
-							isTouchReleased = false;
-							audio.Stop();
+							menuScreenMode = MenuScreenMode.LEVEL_SELECT;
 						}
 
 						if(FB.IsLoggedIn) {
@@ -487,7 +576,7 @@ public class Flashy : MonoBehaviour {
 			if(keepCalm) {
 				GUI.Label (CENTER_SCREEN_MESSAGE, "KEEP CALM AND CARRY ON\n\nCONTINUE IN "+Mathf.RoundToInt(keepCalmTime - keepCalmTimer)+"...");
 			} else {
-				if(gameOver) {
+				if(gameOver || levelPassed) {
 					GUILayout.BeginArea(CENTER_SCREEN);
 							
 					
@@ -501,11 +590,15 @@ public class Flashy : MonoBehaviour {
 								}
 								
 							} else {
-								GUILayout.Label("GAME OVER");
-								GUILayout.Space(20);
-							
-						   		GUILayout.Label("SCORE: "+dodgeCount);
-								GUILayout.Label("   BEST: "+player.bestScore);
+								if(levelPassed) {
+									GUILayout.Label("LEVEL PASSED!");
+								} else {
+									GUILayout.Label("GAME OVER");
+									GUILayout.Space(20);
+								
+							   		GUILayout.Label("SCORE: "+dodgeCount);
+									GUILayout.Label("   BEST: "+player.bestScore);
+								}
 							}
 
 							if(isTouchReleased && isShowingGameOverMenu) {

@@ -5,4 +5,5 @@ public class Player {
 	public int umbrellaCount;
 	public int bestScore;
 	public float reactionLeeway;
+	public int level = 0;
 }
