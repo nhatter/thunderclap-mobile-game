@@ -424,7 +424,7 @@ public class Flashy : MonoBehaviour {
 
 					GUILayout.Space(40);
 
-					if(GUILayout.Button("MAIN MENU", GUILayout.Width(Screen.width))) {
+					if(GUILayout.Button("MAIN MENU")) {
 						menuScreenMode = MenuScreenMode.MAIN_MENU;
 					}
 
