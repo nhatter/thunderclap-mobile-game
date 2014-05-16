@@ -327,7 +327,7 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
-				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Height(800));
+				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Width(Screen.width), GUILayout.Height(500));
 				if(fb.scores != null) {
 
 					int ranking = 0;
