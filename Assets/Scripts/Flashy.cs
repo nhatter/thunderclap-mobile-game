@@ -488,9 +488,9 @@ public class Flashy : MonoBehaviour {
 					GUILayout.BeginVertical();
 					
 					GUILayout.Box (thunderclapLogo);
-					GUILayout.Label("BY GAMER DEVELOPER EXCHANGE", GUILayout.Width(Screen.width));
+					GUILayout.Label("BY GAMER DEVELOPER EXCHANGE LTD\nCOPYRIGHT 2014", GUILayout.Width(Screen.width));
 					GUILayout.Space(10);
-					GUILayout.Label("LEAD PROGRAMMER AND DESIGNER\nNick Hatter\nCEO of giftgaming.com and gamerdevx.com", GUILayout.Width(Screen.width));
+					GUILayout.Label("LEAD PROGRAMMER AND DESIGNER\nNick Hatter, CEO\ngiftgaming.com and gamerdevx.com", GUILayout.Width(Screen.width));
 					GUILayout.Space(10);
 					GUILayout.Label("SPECIAL THANKS");
 					GUILayout.Label("Adam James (Meownoodle on YouTube)");
@@ -498,12 +498,15 @@ public class Flashy : MonoBehaviour {
 					GUILayout.Label("Charles Payne (business-aspirations.com)");
 					GUILayout.Label("Mark Salvin (marksalvin.com)");
 					GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
+					GUILayout.Label("Accelerate Cambridge\nCambridge Judge Business School\nwww.accelerate.jbs.cam.ac.uk");
 
 					GUILayout.Label("MUSIC\n\"Cut and Run\" by Kevin MacLeod (incompetech.com)\nLicensed under Creative Commons: By Attribution 3.0\nhttp://creativecommons.org/licenses/by/3.0/");
 					GUILayout.Label ("GAME OVER SOUND\nwoosh_02.wav by Glaneur de sons (http://www.freesound.org/people/Glaneur%20de%20sons/sounds/34172/)\n\nLicensed under Creative Commons Share Alike 3.0\nhttp://creativecommons.org/licenses/by/3.0/");
 					GUILayout.Label("FONTS\n\"Oswald\" by Vernon Adams (vern@newtypography.co.uk)\nLicensed under SIL OPEN FONT LICENSE Version 1.1\nhttp://scripts.sil.org/OFL\n\n" + 
 			                				"\"Open Sans\" by Steve Matteson\nLicensed under the Apache License, Version 2.0\nhttp://www.apache.org/licenses/LICENSE-2.0");
 				
+					GUILayout.Space(10);
+					GUILayout.Label("THE SOFTWARE, \"THUNDRCLAP\" IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.");
 					GUILayout.EndVertical();
 
 					GUI.skin = skin;
