@@ -39,11 +39,13 @@ public class Flashy : MonoBehaviour {
 
 	float flashTimer;
 	float timeToFlash;
+	float reactionTime;
 
 	bool isFadingIn = false;
 	bool isFlashCaught = false;
 	bool isTouchReleased = true;
 	bool gameOver = false;
+	bool willBeGameOver = false;
 	bool hasSavedGameState = false;
 	bool savedByUmbrella = false;
 	bool isVibrating = false;
@@ -243,7 +245,7 @@ public class Flashy : MonoBehaviour {
 					} else {
 						checkForHighScore();
 
-						gameOver = true;
+						willBeGameOver = true;
 						counterDisplay.text = ""+dodgeCount;
 
 						Debug.Log("Missed the flash");
@@ -305,6 +307,7 @@ public class Flashy : MonoBehaviour {
 				hasSavedGameState = false;
 				isShowingGameOverMenu = false;
 				isNewHighScore = false;
+				reactionTime = 0;
 			}
 		}
 
@@ -319,6 +322,13 @@ public class Flashy : MonoBehaviour {
 				menuScreenMode = MenuScreenMode.LEVEL_SELECT;
 				levelPassedTimer = 0;
 			}
+		}
+
+		if(willBeGameOver && (Input.touchCount > 0 || Input.GetMouseButton(0)) && !gameOver) {
+			reactionTime = flashTimer - timeToFlash;
+			gameOver = true;
+			willBeGameOver = false;
+			Debug.Log("Reaction time "+reactionTime);
 		}
 
 	}
@@ -349,10 +359,12 @@ public class Flashy : MonoBehaviour {
 	}
 
 	public void initFlash() {
-		isFlashCaught = false;
-		isFadingIn = false;
-		flashTimer = 0;
-		calculateTimeToFlash();
+		if(!willBeGameOver) {
+			isFlashCaught = false;
+			isFadingIn = false;
+			flashTimer = 0;
+			calculateTimeToFlash();
+		}
 	}
 
 	Texture friendImage;
@@ -599,9 +611,14 @@ public class Flashy : MonoBehaviour {
 								} else {
 									GUILayout.Label("GAME OVER");
 									GUILayout.Space(20);
-								
-							   		GUILayout.Label("SCORE: "+dodgeCount);
-									GUILayout.Label("   BEST: "+player.bestScore);
+											
+									if(reactionTime > 0) {
+										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s"+"  NEED: "+(flashInTime+flashOutTime)+"s");
+									} else {
+										GUILayout.Label("TAPPED TOO EARLY!");
+									}
+
+									GUILayout.Label("SCORE: "+dodgeCount+"   BEST: "+player.bestScore);
 								}
 							}
 
@@ -633,7 +650,7 @@ public class Flashy : MonoBehaviour {
 									hasSavedGameState = false;
 									isShowingGameOverMenu = false;
 									isNewHighScore = false;
-
+									reactionTime = 0;
 									
 								
 									Debug.Log("Retry pressed");
@@ -749,6 +766,7 @@ public class Flashy : MonoBehaviour {
 			case "CARRY_ON":
 				// Important: start game loop by assuming button pressed
 				// to avoid false positive
+
 				isTouchReleased = false;
 				
 				savedByUmbrella = false;
