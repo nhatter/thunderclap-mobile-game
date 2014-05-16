@@ -701,19 +701,21 @@ public class Flashy : MonoBehaviour {
 						GUILayout.EndArea();
 						GUI.enabled = true;
 				} else {
-					if(savedByUmbrella) {
-						GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
-					} else {
-						if(dodgeCount == 0) {
-							GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
-						}
+					if(!willBeGameOver) {
+						if(savedByUmbrella) {
+							GUI.Label (CENTER_SCREEN_MESSAGE, "SAVED BY UMBRELLA!");
+						} else {
+							if(dodgeCount == 0) {
+								GUI.Label(CENTER_SCREEN_MESSAGE, "WAIT FOR IT...");
+							}
 
-						if(dodgeCount == 1) {
-							GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
-						}
+							if(dodgeCount == 1) {
+								GUI.Label(CENTER_SCREEN_MESSAGE, "YOU'VE GOT IT!");
+							}
 
-						if(dodgeCount%5 == 0 && dodgeCount != 0) {
-							GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+							if(dodgeCount%5 == 0 && dodgeCount != 0) {
+								GUI.Label(CENTER_SCREEN_MESSAGE, congratulatoryPhrase);
+							}
 						}
 					}
 				}// End of gameover check
