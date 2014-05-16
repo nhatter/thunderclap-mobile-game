@@ -260,7 +260,7 @@ public class Flashy : MonoBehaviour {
 				}
 			
 
-				if(flashTimer > timeToFlash+flashInTime+flashOutTime+player.reactionLeeway && !isFlashCaught && !gameOver) {
+				if(flashTimer > timeToFlash+flashInTime+flashOutTime+player.reactionLeeway && !isFlashCaught && !willBeGameOver) {
 					Debug.Log("DEBUG");
 					if(player.umbrellaCount > 0) {
 						savedByUmbrella = true;
@@ -268,11 +268,7 @@ public class Flashy : MonoBehaviour {
 						umbrellaDisplay.text = ""+player.umbrellaCount;
 						isFlashCaught = true;
 					} else {
-						checkForHighScore();
-
 						willBeGameOver = true;
-						counterDisplay.text = ""+dodgeCount;
-
 						Debug.Log("Missed the flash");
 					}
 				}
@@ -357,6 +353,8 @@ public class Flashy : MonoBehaviour {
 			reactionTime = flashTimer - timeToFlash;
 			gameOver = true;
 			willBeGameOver = false;
+			checkForHighScore();
+
 			Debug.Log("Reaction time "+reactionTime);
 		}
 
