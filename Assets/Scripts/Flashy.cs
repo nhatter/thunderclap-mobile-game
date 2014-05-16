@@ -611,11 +611,10 @@ public class Flashy : MonoBehaviour {
 								if(levelPassed) {
 									GUILayout.Label("LEVEL PASSED!");
 								} else {
-									GUILayout.Label("GAME OVER");
-									GUILayout.Space(20);
-											
+									GUILayout.Label("GAME OVER");											
 									if(reactionTime > 0) {
-										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s"+"  NEED: "+(flashInTime+flashOutTime)+"s");
+										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s"
+								        GUILayout.Label("NEED: "+(flashInTime+flashOutTime)+"s");
 									} else {
 										GUILayout.Label("TAPPED TOO EARLY!");
 									}
