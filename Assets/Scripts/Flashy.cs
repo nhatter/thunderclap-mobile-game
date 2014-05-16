@@ -607,6 +607,8 @@ public class Flashy : MonoBehaviour {
 	}
 
 	public void unlockIAP(string productID) {
+		Handheld.StopActivityIndicator();
+
 		switch(productID) {
 			case "3_UMBRELLAS":
 				player.umbrellaCount+= 3;

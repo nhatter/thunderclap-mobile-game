@@ -87,6 +87,8 @@ public class IAPManagerObject : MonoBehaviour {
 	}
 	
 	public void Purchase(String productID) {
+		StartCoroutine(ShowLoading());
+
 		#if UNITY_EDITOR || UNITY_STANDALONE_OSX
 			_IAPManager_Purchase(iap, productID);
 		#elif UNITY_IPHONE
@@ -114,6 +116,17 @@ public class IAPManagerObject : MonoBehaviour {
 		#elif UNITY_WEBPLAYER
 			Application.ExternalCall("unityIAP.destroy", name);
 		#endif
+	}
+
+	IEnumerator ShowLoading() {
+		#if UNITY_IPHONE
+			Handheld.SetActivityIndicatorStyle(iOSActivityIndicatorStyle.Gray);
+		#elif UNITY_ANDROID
+			Handheld.SetActivityIndicatorStyle(AndroidActivityIndicatorStyle.Small);
+		#endif
+		
+		Handheld.StartActivityIndicator();
+		yield return new WaitForSeconds(0);
 	}
 
 	#if UNITY_EDITOR || UNITY_STANDALONE_OSX
