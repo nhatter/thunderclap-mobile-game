@@ -578,6 +578,7 @@ public class Flashy : MonoBehaviour {
 							}
 
 							if(GUILayout.Button("MAIN MENU")) {
+								audio.Play();
 								menuScreenMode = MenuScreenMode.MAIN_MENU;
 							}
 						}
