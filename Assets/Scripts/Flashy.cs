@@ -90,7 +90,7 @@ public class Flashy : MonoBehaviour {
 	Rect shareButtonRect;
 	Rect shareDialogRect;
 	Rect cancelShareButtonRect;
-	string FB_COMMENT_PLACEHOLDER_TEXT = "Say something about this...";
+	string FB_COMMENT_PLACEHOLDER_TEXT = "#thundrclap ";
 	string screenshotComment;
 	Rect screenshotTextAreaRect = new Rect(23, 100, 547, 96);
 	Rect screenshotPreviewRect;
@@ -611,13 +611,8 @@ public class Flashy : MonoBehaviour {
 			GUI.Box(ENTIRE_SCREEN, "", "Overlay");
 			GUI.BeginGroup(shareDialogRect, shareDialogBackground);
 			
-			GUI.SetNextControlName("fbComment");
 			screenshotComment = GUI.TextArea(screenshotTextAreaRect, screenshotComment);
-			
-			if(GUI.GetNameOfFocusedControl() == "fbComment" && screenshotComment == FB_COMMENT_PLACEHOLDER_TEXT) {
-				screenshotComment = "";
-			}
-			
+
 			if(GUI.Button(shareButtonRect, "", "Share")) {
 				fb.shareScreenshot(screenshotComment, delegate() { showShareDialog = false; });
 			}
