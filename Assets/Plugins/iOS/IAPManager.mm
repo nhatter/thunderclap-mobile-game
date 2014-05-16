@@ -155,6 +155,10 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
 //
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
+    const char *gameObj = "Main";
+    const char *methodName = "cancelIAP";
+    const char *msg = "Failed";
+    
     for (SKPaymentTransaction *transaction in transactions)
     {
         switch (transaction.transactionState)
@@ -166,6 +170,7 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
             case SKPaymentTransactionStateFailed:
                 NSLog(@"Transaction status: %@" , @"failed\n");
                 [self failedTransaction:transaction];
+                UnitySendMessage (gameObj, methodName, msg);
                 break;
             case SKPaymentTransactionStateRestored:
                 NSLog(@"Transaction status: %@" , @"restored\n");

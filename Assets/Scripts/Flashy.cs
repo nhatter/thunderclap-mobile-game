@@ -496,6 +496,7 @@ public class Flashy : MonoBehaviour {
 							
 						if((isNewHighScore && highScoreTimer > highScoreTime) || !isNewHighScore)  {
 								if(GUILayout.Button("RETRY")) {
+									Handheld.StopActivityIndicator();
 									initFlash();
 
 									// Reset score
@@ -513,7 +514,9 @@ public class Flashy : MonoBehaviour {
 									highScoreTimer = 0;
 									hasSavedGameState = false;
 									isShowingGameOverMenu = false;
-									isNewHighScore = false;	
+									isNewHighScore = false;
+
+									
 								
 									Debug.Log("Retry pressed");
 								}
@@ -644,6 +647,10 @@ public class Flashy : MonoBehaviour {
 				savePlayer();
 			break;
 		}
+	}
+
+	public void cancelIAP(string reason) {
+		Handheld.StopActivityIndicator();
 	}
 
 	public void canMakePurchases(string iOSResult) {

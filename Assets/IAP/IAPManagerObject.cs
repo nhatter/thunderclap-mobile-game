@@ -122,7 +122,7 @@ public class IAPManagerObject : MonoBehaviour {
 		#if UNITY_IPHONE
 			Handheld.SetActivityIndicatorStyle(iOSActivityIndicatorStyle.Gray);
 		#elif UNITY_ANDROID
-			Handheld.SetActivityIndicatorStyle(AndroidActivityIndicatorStyle.Small);
+			Handheld.SetActivityIndicatorStyle(AndroidActivityIndicatorStyle.Large);
 		#endif
 		
 		Handheld.StartActivityIndicator();
