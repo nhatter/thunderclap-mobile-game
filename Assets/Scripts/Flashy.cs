@@ -63,6 +63,8 @@ public class Flashy : MonoBehaviour {
 	float highScoreTimer = 0;
 	public float highScoreTime = 2.0f;
 	public Texture highScoreImage;
+	bool hasNewRank = false;
+	object beatenFriendScore;
 
 	public float keepCalmTime = 3.0f;
 	float keepCalmTimer = 0f;
@@ -145,6 +147,7 @@ public class Flashy : MonoBehaviour {
 		fb.CallFBInit();
 		fb.initCallback = delegate { fbIndicateConnected(); };
 		fb.loginCallback = delegate { fbIndicateConnected(); };
+		fb.scoresCallback = delegate { getPlayerRank(); };
 		fb.player = player;
 	}
 
@@ -172,6 +175,23 @@ public class Flashy : MonoBehaviour {
 			XMLManager.save<Player>(player, PLAYER_XML_FILE);
 		} catch (Exception e) {
 			Debug.Log("Error parsing giftgaming Player file " + e);
+		}
+	}
+
+	void getPlayerRank() {
+		int rank = 1;
+		foreach(object score in fb.scores) {
+			var entry = (Dictionary<string,object>) score;
+			var user = (Dictionary<string,object>) entry["user"];
+			int playerScore = int.Parse(""+entry["score"]);
+
+			if(player.bestScore > playerScore && FB.UserId != user["id"]) {
+				player.rank = rank;
+				hasNewRank = true;
+				break;
+			}
+			
+			rank++;
 		}
 	}
 	
@@ -290,8 +310,12 @@ public class Flashy : MonoBehaviour {
 			}
 		}
 
-		if(isNewHighScore && highScoreTimer < highScoreTime) {
-			highScoreTimer += Time.deltaTime;
+		if(isNewHighScore) {
+			if(highScoreTimer < highScoreTime) {
+				highScoreTimer += Time.deltaTime;
+			} else {
+				hasNewRank = false;
+			}
 		}
 
 		if(keepCalm) {
@@ -338,6 +362,8 @@ public class Flashy : MonoBehaviour {
 			player.bestScore = dodgeCount;
 			isNewHighScore = true;
 			audio.PlayOneShot(highScoreSound);
+
+			fb.QueryScores();
 		} else {
 			audio.PlayOneShot(zapSound);
 		}
@@ -345,8 +371,10 @@ public class Flashy : MonoBehaviour {
 		if (FB.IsLoggedIn) {
 			var query = new Dictionary<string, string>();
 			query["score"] = ""+player.bestScore;
-			FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
+			FB.API("/me/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.POST, delegate(FBResult r) { Debug.Log("Result: " + r.Text); }, query);
 		}
+
+
 	}
 	
 	
@@ -368,6 +396,7 @@ public class Flashy : MonoBehaviour {
 	}
 
 	Texture friendImage;
+	Texture beatenFriendImage;
 
 	void OnGUI() {
 		GUI.skin = skin;
@@ -605,6 +634,10 @@ public class Flashy : MonoBehaviour {
 								if(highScoreTimer < highScoreTime) {
 									GUILayout.Box(highScoreImage);
 									GUILayout.Label("NEW HIGH SCORE!");
+									if(hasNewRank) {
+										GUILayout.Space(50);
+										GUILayout.Label("NEW RANK: #"+player.rank+" OUT OF "+fb.scores.Count);
+									}
 								} else {
 									GUILayout.Label("NEW HIGH SCORE: "+dodgeCount);
 									GUILayout.Label("OMG.");
@@ -798,5 +831,4 @@ public class Flashy : MonoBehaviour {
 			break;
 		}
 	}
-
 }

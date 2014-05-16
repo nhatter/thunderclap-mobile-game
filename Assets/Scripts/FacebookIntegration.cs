@@ -24,6 +24,7 @@ public class FacebookIntegration : MonoBehaviour {
 
 	public Action loginCallback;
 	public Action initCallback;
+	public Action scoresCallback;
 	
 	public void CallFBInit()
 	{
@@ -108,10 +109,10 @@ public class FacebookIntegration : MonoBehaviour {
 
 	public void QueryScores()
 	{
-		FB.API("/app/scores?fields=score,user.limit(20)", Facebook.HttpMethod.GET, ScoresCallback);
+		FB.API("/app/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.GET, HandleScores);
 	}
 
-	void ScoresCallback(FBResult result) 
+	void HandleScores(FBResult result) 
 	{
 		if (result.Error != null)
 		{
@@ -150,6 +151,8 @@ public class FacebookIntegration : MonoBehaviour {
 			return -getScoreFromEntry(firstObj).CompareTo(getScoreFromEntry(secondObj));
 		}
 		);
+
+		scoresCallback();
 	}
 
 	private int getScoreFromEntry(object obj)

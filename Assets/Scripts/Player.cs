@@ -6,4 +6,5 @@ public class Player {
 	public int bestScore;
 	public float reactionLeeway;
 	public int level = 0;
+	public int rank = 0;
 }
