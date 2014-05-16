@@ -21,6 +21,8 @@ public class FacebookIntegration : MonoBehaviour {
 	public Dictionary<string, Texture>  friendImages    = new Dictionary<string, Texture>();
 
 	public Player player;
+
+	public Action loginCallback;
 	
 	public void CallFBInit()
 	{
@@ -40,10 +42,10 @@ public class FacebookIntegration : MonoBehaviour {
 	
 	public void CallFBLogin()
 	{
-		FB.Login("public_profile,publish_actions", LoginCallback);
+		FB.Login("public_profile,publish_actions", HandleLogin);
 	}
 	
-	void LoginCallback(FBResult result)
+	void HandleLogin(FBResult result)
 	{
 		if (result.Error != null)
 			lastResponse = "Error Response:\n" + result.Error;
@@ -55,6 +57,8 @@ public class FacebookIntegration : MonoBehaviour {
 		{
 			lastResponse = "Login was successful!";
 		}
+
+		loginCallback();
 	}
 	
 	public void CallFBLogout()

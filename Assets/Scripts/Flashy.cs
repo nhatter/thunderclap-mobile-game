@@ -95,6 +95,8 @@ public class Flashy : MonoBehaviour {
 	Rect screenshotTextAreaRect = new Rect(23, 100, 547, 96);
 	Rect screenshotPreviewRect;
 	float screenRatio = (float) Screen.height / (float) Screen.width;
+	GUIContent fbConnectButton;
+	public Texture2D fbConnectIcon;
 
 	Vector2 creditScrollPosition = new Vector2(0,0);
 
@@ -130,9 +132,18 @@ public class Flashy : MonoBehaviour {
 		cancelShareButtonRect = new Rect((Screen.width - shareDialogBackground.width)/2 - 4, 4, facebookSkin.GetStyle("Cancel").fixedWidth, facebookSkin.GetStyle("Cancel").fixedHeight);
 		screenshotComment = FB_COMMENT_PLACEHOLDER_TEXT;
 		screenshotPreviewRect = new Rect (23, 225, 400, 400 * screenRatio);
+		fbConnectButton = new GUIContent(" CONNECT", fbConnectIcon);
 
 		fb.CallFBInit();
+		fbIndicateConnected();
+		fb.loginCallback = delegate { fbIndicateConnected(); };
 		fb.player = player;
+	}
+
+	void fbIndicateConnected() {
+		if(FB.IsLoggedIn) {
+			fbConnectButton.text = " CONNECTED ✓";
+		}
 	}
 
 	void loadPlayer() {
@@ -436,13 +447,23 @@ public class Flashy : MonoBehaviour {
 							audio.Stop();
 						}
 
-						if(GUILayout.Button("f CONNECT")) {							
+						if(FB.IsLoggedIn) {
+							GUI.enabled = false;
+						}		
+
+						if(GUILayout.Button(fbConnectButton)) {							
 							fb.CallFBLogin();
 						}
 
-						if(GUILayout.Button("FRIENDS' SCORES")) {							
-							fb.QueryScores();
-							menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+						GUI.enabled = true;
+
+						if(GUILayout.Button("FRIENDS' SCORES")) {
+							if(!FB.IsLoggedIn) {
+								fb.CallFBLogin();
+							} else {
+								fb.QueryScores();
+								menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+							}
 						}
 			
 						if(GUILayout.Button("HOW TO PLAY")) {
