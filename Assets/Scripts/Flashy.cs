@@ -7,7 +7,12 @@ using System.IO;
 public class Flashy : MonoBehaviour {
 	public enum MenuScreenMode {HEALTH_WARNING, MAIN_MENU, HOW_TO_PLAY, SHOP, CREDITS, ACHIEVEMENTS, GAME, FRIEND_SCORES, LEVEL_SELECT};
 	public MenuScreenMode menuScreenMode = MenuScreenMode.HEALTH_WARNING;
-	public int POINTS_TO_PASS_LEVEL = 10;
+
+	#if UNITY_EDITOR
+	 	int POINTS_TO_PASS_LEVEL = 1;
+	#else
+	 	int POINTS_TO_PASS_LEVEL = 10;
+	#endif
 
 	public GUISkin skin;
 	public GUISkin creditsSkin;
@@ -197,7 +202,7 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(isTraining && dodgeCount >= POINTS_TO_PASS_LEVEL && !levelPassed) {
+		if(menuScreenMode == MenuScreenMode.GAME && isTraining && dodgeCount >= POINTS_TO_PASS_LEVEL && !levelPassed) {
 			if(player.level < attemptingLevel) {
 				player.level = attemptingLevel;
 			}
@@ -452,6 +457,8 @@ public class Flashy : MonoBehaviour {
 					}
 
 					GUILayout.Space(40);
+
+					GUI.enabled = true;
 
 					if(GUILayout.Button("MAIN MENU")) {
 						menuScreenMode = MenuScreenMode.MAIN_MENU;
