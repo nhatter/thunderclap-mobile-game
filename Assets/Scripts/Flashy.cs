@@ -614,7 +614,7 @@ public class Flashy : MonoBehaviour {
 									GUILayout.Label("GAME OVER");											
 									if(reactionTime > 0) {
 										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s");
-								        GUILayout.Label("NEED: "+(flashInTime+flashOutTime)+"s");
+								        GUILayout.Label("    NEEDED: "+(flashInTime+flashOutTime)+"s");
 									} else {
 										GUILayout.Label("TAPPED TOO EARLY!");
 									}
