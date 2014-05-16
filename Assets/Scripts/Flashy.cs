@@ -366,7 +366,7 @@ public class Flashy : MonoBehaviour {
 					GUILayout.BeginArea(CENTER_SCREEN);
 					GUI.enabled = true;
 					
-					if(GUILayout.Button("PLAY VS. FRIENDS")) {
+					if(GUILayout.Button("PLAY")) {
 						isTraining = false;
 						flashOutTime = 0.3f;
 						menuScreenMode = MenuScreenMode.GAME;
