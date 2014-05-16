@@ -400,6 +400,7 @@ public class Flashy : MonoBehaviour {
 						audio.Stop();
 						levelPassed = false;
 						dodgeCount = 0;
+						counterDisplay.text = ""+dodgeCount;
 					}
 
 					GUI.enabled = (player.level > 0);
@@ -413,6 +414,7 @@ public class Flashy : MonoBehaviour {
 						audio.Stop();
 						levelPassed = false;
 						dodgeCount = 0;
+						counterDisplay.text = ""+dodgeCount;
 					}
 
 					GUI.enabled = (player.level > 1);
@@ -426,6 +428,7 @@ public class Flashy : MonoBehaviour {
 						audio.Stop();
 						levelPassed = false;
 						dodgeCount = 0;
+						counterDisplay.text = ""+dodgeCount;
 					}
 
 					GUILayout.Space(40);
