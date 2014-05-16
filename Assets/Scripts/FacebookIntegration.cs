@@ -23,6 +23,7 @@ public class FacebookIntegration : MonoBehaviour {
 	public Player player;
 
 	public Action loginCallback;
+	public Action initCallback;
 	
 	public void CallFBInit()
 	{
@@ -33,6 +34,8 @@ public class FacebookIntegration : MonoBehaviour {
 	{
 		Debug.Log("FB.Init completed: Is user logged in? " + FB.IsLoggedIn);
 		isInit = true;
+
+		initCallback();
 	}
 	
 	public void OnHideUnity(bool isGameShown)

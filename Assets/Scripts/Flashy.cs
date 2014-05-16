@@ -143,14 +143,14 @@ public class Flashy : MonoBehaviour {
 		fbConnectButton = new GUIContent(" CONNECT", fbConnectIcon);
 
 		fb.CallFBInit();
-		fbIndicateConnected();
+		fb.initCallback = delegate { fbIndicateConnected(); };
 		fb.loginCallback = delegate { fbIndicateConnected(); };
 		fb.player = player;
 	}
 
 	void fbIndicateConnected() {
 		if(FB.IsLoggedIn) {
-			fbConnectButton.text = " CONNECTED ✓";
+			fbConnectButton.text = " CONNECTED";
 		}
 	}
 
