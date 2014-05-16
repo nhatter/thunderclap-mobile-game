@@ -327,14 +327,27 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
-				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true);
+				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Height(800));
 				if(fb.scores != null) {
+
+					int ranking = 0;
 					foreach(object score in fb.scores) {
+				
 						var friendScore = (Dictionary<string, object>) score;
 						var user = (Dictionary<string, object>) friendScore["user"];
 						
+						if(ranking == 0) {
+							GUILayout.Label("Champion:");
+						}
+
+						if(ranking == 1) {
+							GUILayout.Space(20);
+						}
+
 						GUILayout.BeginHorizontal();
 							if(fb.friendImages.TryGetValue(""+user["id"], out friendImage)) {
+								ranking++;
+								GUILayout.Label("#"+ranking+" ", GUILayout.Width(75));
 								GUILayout.Label(friendImage, GUILayout.Width(75));
 								GUILayout.Label(""+user["name"], GUILayout.Width(400));
 								GUILayout.Label(""+friendScore["score"], GUILayout.Width(80));
