@@ -378,15 +378,6 @@ public class Flashy : MonoBehaviour {
 					GUILayout.BeginArea(CENTER_SCREEN);
 					GUI.enabled = true;
 					
-					if(GUILayout.Button("PLAY")) {
-						isTraining = false;
-						flashOutTime = 0.3f;
-						menuScreenMode = MenuScreenMode.GAME;
-						isTouchReleased = false;
-						audio.Stop();
-						levelPassed = false;
-					}
-
 					GUILayout.Space (40);
 					GUILayout.Label("TRAINING");
 					GUILayout.Label("(10 PTS TO PASS)");
@@ -531,10 +522,8 @@ public class Flashy : MonoBehaviour {
 
 			case MenuScreenMode.HOW_TO_PLAY:
 						GUILayout.Label("ONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nUMBRELLAS ALLOW YOU TO MAKE A MISTAKE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
-						if(GUILayout.Button("PLAY")) {
-							menuScreenMode = MenuScreenMode.GAME;
-							isTouchReleased = false;
-							audio.Stop();
+						if(GUILayout.Button("TRAINING")) {
+							menuScreenMode = MenuScreenMode.LEVEL_SELECT;
 						}
 			break;
 
@@ -546,8 +535,18 @@ public class Flashy : MonoBehaviour {
 						GUILayout.BeginVertical();
 						GUILayout.Label(thunderclapLogo);
 						GUILayout.Space(25);
-			
+
+
 						if(GUILayout.Button("PLAY")) {
+							isTraining = false;
+							flashOutTime = 0.3f;
+							menuScreenMode = MenuScreenMode.GAME;
+							isTouchReleased = false;
+							audio.Stop();
+							levelPassed = false;
+						}
+
+						if(GUILayout.Button("TRAINING")) {
 							menuScreenMode = MenuScreenMode.LEVEL_SELECT;
 						}
 
