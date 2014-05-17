@@ -206,6 +206,10 @@ public class Flashy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+			Application.Quit(); 
+		}
+
 		if(menuScreenMode == MenuScreenMode.GAME && isTraining && dodgeCount >= POINTS_TO_PASS_LEVEL && !levelPassed) {
 			if(player.level < attemptingLevel) {
 				player.level = attemptingLevel;
