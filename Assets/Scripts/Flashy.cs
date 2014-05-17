@@ -78,7 +78,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
-	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
+	Rect ENTIRE_SCREEN = new Rect(10, 10, Screen.width-20, Screen.height-20);
 	Rect CENTER_SCREEN = new Rect(25, 100, Screen.width - 50, Screen.height - 25);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
 
@@ -554,18 +554,28 @@ public class Flashy : MonoBehaviour {
 			break;
 		
 			case MenuScreenMode.HEALTH_WARNING:
-				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.");
+				GUILayout.BeginArea(ENTIRE_SCREEN);
+				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.\n\nTHIS GAME IS NOT SUITABLE FOR ASTRAPHOBICS.");
 
 				if(GUILayout.Button("OK")) {
-					menuScreenMode = MenuScreenMode.MAIN_MENU;
+					if(player.hasLearntHowToPlay) {
+						menuScreenMode = MenuScreenMode.MAIN_MENU;
+					} else {
+						player.hasLearntHowToPlay = true;
+						menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
+						savePlayer();
+					}
 				}
+				GUILayout.EndArea();
 			break;
 
 			case MenuScreenMode.HOW_TO_PLAY:
-						GUILayout.Label("ONLY TOUCH THE SCREEN WHEN IT FLASHES WHITE.\n\nUMBRELLAS ALLOW YOU TO MAKE A MISTAKE.\n\nTHIS IS A HARD GAME AND TAKES PRACTICE.");
-						if(GUILayout.Button("TRAINING")) {
-							menuScreenMode = MenuScreenMode.LEVEL_SELECT;
+				GUILayout.BeginArea(ENTIRE_SCREEN);
+					GUILayout.Label("HOW TO PLAY\nTouch the screen when it flashes white.\n\nUmbrellas allow you to make a mistake.\n\nThis is a hard game. Training is recommended.");
+						if(GUILayout.Button("OK")) {
+							menuScreenMode = MenuScreenMode.MAIN_MENU;
 						}
+				GUILayout.EndArea();
 			break;
 
 			case MenuScreenMode.MAIN_MENU:
