@@ -78,6 +78,7 @@ public class Flashy : MonoBehaviour {
 	GUIContent counterDisplay = new GUIContent();
 	GUIContent umbrellaDisplay = new GUIContent();
 
+	Rect ENTIRE_SCREEN_NO_BORDER = new Rect(0, 0, Screen.width, Screen.height);
 	Rect ENTIRE_SCREEN = new Rect(10, 10, Screen.width-20, Screen.height-20);
 	Rect CENTER_SCREEN = new Rect(25, 100, Screen.width - 50, Screen.height - 25);
 	Rect CENTER_SCREEN_MESSAGE = new Rect(Screen.width/4 - 75, Screen.height/2 - 100, Screen.width/2 + 150, 400);
@@ -158,11 +159,13 @@ public class Flashy : MonoBehaviour {
 		fb.loginCallback = delegate { fbIndicateConnected(); };
 		fb.scoresCallback = delegate { getPlayerRank(); };
 		fb.player = player;
+
 	}
 
 	void fbIndicateConnected() {
 		if(FB.IsLoggedIn) {
 			fbConnectButton.text = " CONNECTED";
+			Debug.Log("DEBUG: "+FB.Android.KeyHash);
 		}
 	}
 
@@ -788,7 +791,7 @@ public class Flashy : MonoBehaviour {
 
 		GUI.skin = facebookSkin;
 		if(showShareDialog) {
-			GUI.Box(ENTIRE_SCREEN, "", "Overlay");
+			GUI.Box(ENTIRE_SCREEN_NO_BORDER, "", "Overlay");
 			GUI.BeginGroup(shareDialogRect, shareDialogBackground);
 			
 			screenshotComment = GUI.TextArea(screenshotTextAreaRect, screenshotComment);
