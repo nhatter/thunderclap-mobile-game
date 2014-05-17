@@ -111,6 +111,8 @@ public class Flashy : MonoBehaviour {
 	Rect screenshotPreviewRect;
 	float screenRatio = (float) Screen.height / (float) Screen.width;
 	GUIContent fbConnectButton;
+	GUIContent fbLikeButton;
+	GUIContent fbFriendsScoresButton;
 	public Texture2D fbConnectIcon;
 
 	Vector2 creditScrollPosition = new Vector2(0,0);
@@ -148,6 +150,8 @@ public class Flashy : MonoBehaviour {
 		screenshotComment = FB_COMMENT_PLACEHOLDER_TEXT;
 		screenshotPreviewRect = new Rect (23, 225, 400, 400 * screenRatio);
 		fbConnectButton = new GUIContent(" CONNECT", fbConnectIcon);
+		fbLikeButton = new GUIContent(" LIKE THUNDRCLAP", fbConnectIcon);
+		fbFriendsScoresButton = new GUIContent(" FRIENDS' SCORES", fbConnectIcon);
 
 		fb.CallFBInit();
 		fb.initCallback = delegate { fbIndicateConnected(); };
@@ -597,7 +601,11 @@ public class Flashy : MonoBehaviour {
 
 						GUI.enabled = true;
 
-						if(GUILayout.Button("FRIENDS' SCORES")) {
+						if(GUILayout.Button(fbLikeButton)) {
+							Application.OpenURL("https://www.facebook.com/thundrclap");
+						}
+
+						if(GUILayout.Button(fbFriendsScoresButton)) {
 							if(!FB.IsLoggedIn) {
 								fb.CallFBLogin();
 							} else {
