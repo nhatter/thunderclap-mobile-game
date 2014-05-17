@@ -611,7 +611,7 @@ public class Flashy : MonoBehaviour {
 							} else {
 								var query = new Dictionary<string, string>();
 								query["score"] = ""+player.bestScore;
-								FB.API("/me/scores", Facebook.HttpMethod.POST, delegate(FBResult r) { 
+								FB.API("/me/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.POST, delegate(FBResult r) { 
 									fb.QueryScores();
 									menuScreenMode = MenuScreenMode.FRIEND_SCORES;
 								}, query);
