@@ -317,12 +317,13 @@ public class Flashy : MonoBehaviour {
 
 		if(menuScreenMode == MenuScreenMode.CREDITS) {
 			creditScrollPosition = new Vector2(0, Mathf.RoundToInt(creditScrollPosition.y + Time.deltaTime*creditsScrollSpeed));
-			if(creditScrollPosition.y > 5600) {
+			if(creditScrollPosition.y > 6200) {
 				menuScreenMode = MenuScreenMode.MAIN_MENU;
 
-				if(!player.freeUmbrellas) {
+				if(!player.hasFreeUmbrellas) {
 					unlockIAP("3_UMBRELLAS");
 					player.hasFreeUmbrellas = true;
+					savePlayer();
 				}
 			}
 
@@ -537,7 +538,7 @@ public class Flashy : MonoBehaviour {
 					GUI.skin = creditsSkin;
 
 					GUILayout.BeginVertical();
-					
+					GUILayout.Space(300);
 					GUILayout.Box (thunderclapLogo);
 					GUILayout.Label("BY GAMER DEVELOPER EXCHANGE LTD\nCOPYRIGHT 2014", GUILayout.Width(Screen.width));
 					GUILayout.Space(10);
@@ -560,6 +561,8 @@ public class Flashy : MonoBehaviour {
 					GUILayout.Label("THE SOFTWARE, \"THUNDRCLAP\" IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.");
 					GUILayout.Label("THANK YOU FOR PLAYING AND WATCHING THE CREDITS");
 					GUILayout.Label("Have 3 umbrellas, on us.");
+					GUILayout.Space(300);
+					
 					GUILayout.EndVertical();
 
 					GUI.skin = skin;
