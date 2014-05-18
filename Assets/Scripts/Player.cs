@@ -8,4 +8,5 @@ public class Player {
 	public int level = 0;
 	public int rank = 0;
 	public bool hasLearntHowToPlay = false;
+	public bool hasFreeUmbrellas = false;
 }

@@ -117,6 +117,7 @@ public class Flashy : MonoBehaviour {
 	public Texture2D fbConnectIcon;
 
 	Vector2 creditScrollPosition = new Vector2(0,0);
+	public float creditsScrollSpeed = 1.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -315,11 +316,16 @@ public class Flashy : MonoBehaviour {
 			#endif
 
 		if(menuScreenMode == MenuScreenMode.CREDITS) {
-			if(Input.touchCount > 0) {
-				if(Input.GetTouch(0).phase == TouchPhase.Moved) {
-					creditScrollPosition = new Vector2(creditScrollPosition.x, creditScrollPosition.y + Input.GetTouch(0).deltaPosition.y);
+			creditScrollPosition = new Vector2(0, Mathf.RoundToInt(creditScrollPosition.y + Time.deltaTime*creditsScrollSpeed));
+			if(creditScrollPosition.y > 5600) {
+				menuScreenMode = MenuScreenMode.MAIN_MENU;
+
+				if(!player.freeUmbrellas) {
+					unlockIAP("3_UMBRELLAS");
+					player.hasFreeUmbrellas = true;
 				}
 			}
+
 		}
 
 		if(isNewHighScore) {
@@ -480,7 +486,7 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
-				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Width(Screen.width), GUILayout.Height(500));
+				GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Width(Screen.width), GUILayout.Height(500));
 				if(fb.scores != null) {
 
 					int ranking = 0;
@@ -538,11 +544,11 @@ public class Flashy : MonoBehaviour {
 					GUILayout.Label("LEAD PROGRAMMER AND DESIGNER\nNick Hatter, CEO\ngiftgaming.com and gamerdevx.com", GUILayout.Width(Screen.width));
 					GUILayout.Space(10);
 					GUILayout.Label("SPECIAL THANKS");
-					GUILayout.Label("Adam James (Meownoodle on YouTube)");
+					GUILayout.Label("Adam \"Cate\" James\nyoutube.com/themeownoodle\ntwitter.com/TheMeownoodle");
+					GUILayout.Label("Cate (The Original Nemesis of Doge)\nfb.com/AntiDoge5Life");
 					GUILayout.Label("Robert Streeting (robsws.co.uk)");
 					GUILayout.Label("Charles Payne (business-aspirations.com)");
 					GUILayout.Label("Mark Salvin (marksalvin.com)");
-					GUILayout.Label("Cate (AntiDoge5Life on Facebook)");
 					GUILayout.Label("Accelerate Cambridge\nCambridge Judge Business School\nwww.accelerate.jbs.cam.ac.uk");
 
 					GUILayout.Label("MUSIC\n\"Cut and Run\" by Kevin MacLeod (incompetech.com)\nLicensed under Creative Commons: By Attribution 3.0\nhttp://creativecommons.org/licenses/by/3.0/");
@@ -552,6 +558,8 @@ public class Flashy : MonoBehaviour {
 				
 					GUILayout.Space(10);
 					GUILayout.Label("THE SOFTWARE, \"THUNDRCLAP\" IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.");
+					GUILayout.Label("THANK YOU FOR PLAYING AND WATCHING THE CREDITS");
+					GUILayout.Label("Have 3 umbrellas, on us.");
 					GUILayout.EndVertical();
 
 					GUI.skin = skin;
