@@ -326,8 +326,9 @@ public class Flashy : MonoBehaviour {
 					unlockIAP("3_UMBRELLAS");
 					player.hasFreeUmbrellas = true;
 					savePlayer();
-					creditScrollPosition = new Vector2(0,0);
 				}
+
+				creditScrollPosition = new Vector2(0,0);
 			}
 
 		}
