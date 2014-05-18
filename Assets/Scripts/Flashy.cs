@@ -537,7 +537,7 @@ public class Flashy : MonoBehaviour {
 					menuScreenMode = MenuScreenMode.MAIN_MENU;
 				}
 
-				creditScrollPosition = GUILayout.BeginScrollView(creditScrollPosition, false, true);
+				 GUILayout.BeginScrollView(creditScrollPosition, false, true);
 					GUI.skin = creditsSkin;
 
 					GUILayout.BeginVertical();
