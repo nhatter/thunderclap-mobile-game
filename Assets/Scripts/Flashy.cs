@@ -680,7 +680,7 @@ public class Flashy : MonoBehaviour {
 									GUILayout.Label("GAME OVER");											
 									if(reactionTime > 0) {
 										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s");
-								        GUILayout.Label("    NEEDED: "+(flashInTime+flashOutTime)+"s");
+								        GUILayout.Label("    NEEDED: "+(flashInTime+flashOutTime+player.reactionLeeway)+"s");
 									} else {
 										GUILayout.Label("TAPPED TOO EARLY!");
 									}
@@ -744,6 +744,10 @@ public class Flashy : MonoBehaviour {
 									#else
 										iap.Purchase("CARRY_ON");
 									#endif
+								}
+
+								if(player.reactionLeeway > 0) {
+									GUI.enabled = false;
 								}
 
 								if(GUILayout.Button("BUY MORE TIME")) {
@@ -843,7 +847,7 @@ public class Flashy : MonoBehaviour {
 				keepCalm = true;
 			break;
 
-			case "EXTRA_TIME":
+			case "MORE_TIME":
 				player.reactionLeeway = 0.1f;
 				savePlayer();
 			break;
