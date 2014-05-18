@@ -116,6 +116,8 @@ public class Flashy : MonoBehaviour {
 	GUIContent fbFriendsScoresButton;
 	public Texture2D fbConnectIcon;
 
+	Vector2 scoreScrollPosition = new Vector2(0,0);
+
 	Vector2 creditScrollPosition = new Vector2(0,0);
 	public float creditsScrollSpeed = 1.0f;
 
@@ -324,6 +326,7 @@ public class Flashy : MonoBehaviour {
 					unlockIAP("3_UMBRELLAS");
 					player.hasFreeUmbrellas = true;
 					savePlayer();
+					creditScrollPosition = new Vector2(0,0);
 				}
 			}
 
@@ -487,7 +490,7 @@ public class Flashy : MonoBehaviour {
 				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
-				GUILayout.BeginScrollView(creditScrollPosition, false, true, GUILayout.Width(Screen.width), GUILayout.Height(500));
+				scoreScrollPosition = GUILayout.BeginScrollView(scoreScrollPosition, false, true, GUILayout.Width(Screen.width), GUILayout.Height(Screen.height-300) );
 				if(fb.scores != null) {
 
 					int ranking = 0;
