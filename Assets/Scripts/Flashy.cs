@@ -691,16 +691,16 @@ public class Flashy : MonoBehaviour {
 							} else {
 								if(levelPassed) {
 									GUILayout.Label("LEVEL PASSED!");
-								} else {
-									GUILayout.Label("GAME OVER");											
+								} else {								
 									if(reactionTime > 0) {
-										GUILayout.Label("REACTION: " + Math.Round(reactionTime, 3)+"s");
-								        GUILayout.Label("    NEEDED: "+(flashInTime+flashOutTime+player.reactionLeeway)+"s");
+										GUILayout.Label("GAME OVER: "+Math.Round(reactionTime, 3)+"s");	
+								        GUILayout.Label("        NEEDED: "+(flashInTime+flashOutTime+player.reactionLeeway)+"s");
 									} else {
+										GUILayout.Label("GAME OVER");	
 										GUILayout.Label("TAPPED TOO EARLY!");
 									}
 
-									GUILayout.Label("SCORE: "+dodgeCount+"   BEST: "+player.bestScore);
+										GUILayout.Label("          SCORE: "+dodgeCount+"   BEST: "+player.bestScore);
 								}
 							}
 
