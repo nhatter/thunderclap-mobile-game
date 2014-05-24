@@ -333,6 +333,12 @@ public class Flashy : MonoBehaviour {
 
 		}
 
+		if(menuScreenMode == MenuScreenMode.FRIEND_SCORES) {
+			if(Input.touchCount > 0) {
+				scoreScrollPosition = new Vector2(0, Mathf.RoundToInt(scoreScrollPosition.y + Input.GetTouch(0).deltaPosition.y));
+			}
+		}
+
 		if(isNewHighScore) {
 			if(highScoreTimer < highScoreTime) {
 				highScoreTimer += Time.deltaTime;
@@ -621,6 +627,7 @@ public class Flashy : MonoBehaviour {
 
 						if(GUILayout.Button("TRAINING")) {
 							menuScreenMode = MenuScreenMode.LEVEL_SELECT;
+							Handheld.StopActivityIndicator();
 						}
 
 						if(FB.IsLoggedIn) {
@@ -641,17 +648,20 @@ public class Flashy : MonoBehaviour {
 							if(!FB.IsLoggedIn) {
 								fb.CallFBLogin();
 							} else {
+								Handheld.StartActivityIndicator();
 								var query = new Dictionary<string, string>();
 								query["score"] = ""+player.bestScore;
 								FB.API("/me/scores?access_token="+FB.AccessToken, Facebook.HttpMethod.POST, delegate(FBResult r) { 
 									fb.QueryScores();
 									menuScreenMode = MenuScreenMode.FRIEND_SCORES;
+									Handheld.StopActivityIndicator();
 								}, query);
 							}
 						}
 			
 						if(GUILayout.Button("HOW TO PLAY")) {
 							menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
+							Handheld.StopActivityIndicator();
 						}
 
 						#if UNITY_IOS && !UNITY_EDITOR
@@ -662,6 +672,7 @@ public class Flashy : MonoBehaviour {
 
 						if(GUILayout.Button("CREDITS")) {
 							menuScreenMode = MenuScreenMode.CREDITS;
+							Handheld.StopActivityIndicator();
 						}
 						GUILayout.EndVertical();
 
