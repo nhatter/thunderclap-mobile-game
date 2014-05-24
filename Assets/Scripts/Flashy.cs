@@ -654,10 +654,18 @@ public class Flashy : MonoBehaviour {
 							menuScreenMode = MenuScreenMode.HOW_TO_PLAY;
 						}
 
+						#if UNITY_IOS && !UNITY_EDITOR
+						if(GUILayout.Button("RESTORE PURCHASES")) {
+							iap.RestorePurchases();
+						}
+						#endif
+
 						if(GUILayout.Button("CREDITS")) {
 							menuScreenMode = MenuScreenMode.CREDITS;
 						}
 						GUILayout.EndVertical();
+
+					
 			
 					GUILayout.EndArea();
 			break;

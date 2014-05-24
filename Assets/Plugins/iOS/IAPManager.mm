@@ -61,6 +61,10 @@ extern "C" void UnitySendMessage(const char *, const char *, const char *);
     [productsRequest start];
 }
 
+- (void)restoreCompletedTransactions {
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
 #pragma -
 #pragma Purchase helpers
 
@@ -188,6 +192,7 @@ extern "C" {
 	void _IAPManager_Destroy(void *instance);
     void _IAPManager_Purchase(void *instance, const char *productID);
     void _IAPManager_CanMakePurchases(void *instance);
+    void _IAPManager_RestorePurchases(void *instance);
 }
 
 void *_IAPManager_Init()
@@ -214,6 +219,11 @@ void _IAPManager_Purchase(void *instance, const char *productID)
     NSString *productIDString = [NSString stringWithUTF8String:productID];
 	IAPManager *iap = (IAPManager *)instance;
 	[iap purchase:productIDString];
+}
+
+void _IAPManager_RestorePurchases(void *instance) {
+    IAPManager *iap = (IAPManager *)instance;
+	[iap restoreCompletedTransactions];
 }
 
 void _IAPManager_Destroy(void *instance)

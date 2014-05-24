@@ -52,6 +52,8 @@ public class IAPManagerObject : MonoBehaviour {
 		private static extern int _IAPManager_Purchase(IntPtr instance, string productID);
 		[DllImport("IAPManager")]
 		private static extern int _IAPManager_CanMakePurchases(IntPtr instance);
+		[DllImport("IAPManager")]
+		private static extern int _IAPManager_RestorePurchases(IntPtr instance);
 	#elif UNITY_IPHONE
 		[DllImport("__Internal")]
 		private static extern IntPtr _IAPManager_Init();
@@ -61,6 +63,8 @@ public class IAPManagerObject : MonoBehaviour {
 		private static extern bool _IAPManager_Purchase(IntPtr instance, string productID);
 		[DllImport("__Internal")]
 		private static extern int _IAPManager_CanMakePurchases(IntPtr instance);
+		[DllImport("__Internal")]
+		private static extern int _IAPManager_RestorePurchases(IntPtr instance);
 	#endif
 
 	public void Init() {
@@ -100,6 +104,20 @@ public class IAPManagerObject : MonoBehaviour {
 		#endif
 	}
 
+	public void RestorePurchases() {
+		StartCoroutine(ShowLoading());
+
+		#if UNITY_EDITOR || UNITY_STANDALONE_OSX
+			_IAPManager_RestorePurchases(iap);
+		#elif UNITY_IPHONE
+			_IAPManager_RestorePurchases(iap);
+		#elif UNITY_ANDROID
+			//	iap.Call("RestorePurchases");
+		#elif UNITY_WEBPLAYER
+			Application.ExternalCall("unityIAP.RestorePurchases");
+		#endif
+	}
+
 	void OnDestroy() {
 		#if UNITY_EDITOR || UNITY_STANDALONE_OSX
 			if (iap == IntPtr.Zero)
@@ -128,6 +146,8 @@ public class IAPManagerObject : MonoBehaviour {
 		Handheld.StartActivityIndicator();
 		yield return new WaitForSeconds(0);
 	}
+
+
 
 	#if UNITY_EDITOR || UNITY_STANDALONE_OSX
 	void OnGUI() {
