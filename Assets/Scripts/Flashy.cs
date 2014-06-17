@@ -121,6 +121,8 @@ public class Flashy : MonoBehaviour {
 	Vector2 creditScrollPosition = new Vector2(0,0);
 	public float creditsScrollSpeed = 1.0f;
 
+	public static Flashy use;
+
 	// Use this for initialization
 	void Start () {
 		iTween.CameraFadeAdd(flashTexture);
@@ -163,6 +165,7 @@ public class Flashy : MonoBehaviour {
 		fb.scoresCallback = delegate { getPlayerRank(); };
 		fb.player = player;
 
+		use = this;
 	}
 
 	void fbIndicateConnected() {
@@ -432,10 +435,14 @@ public class Flashy : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin = skin;
 
+		if(giftgaming.use.isGiftOpened()) {
+			return;
+		}
+
 		switch(menuScreenMode) {
 			case MenuScreenMode.LEVEL_SELECT:
-					
-					GUILayout.BeginArea(CENTER_SCREEN);
+				giftgaming.use.isSafeToDistractPlayer = false;
+				GUILayout.BeginArea(CENTER_SCREEN);
 					GUI.enabled = true;
 					
 					GUILayout.Space (40);
@@ -494,6 +501,7 @@ public class Flashy : MonoBehaviour {
 			break;
 
 			case MenuScreenMode.FRIEND_SCORES:
+				giftgaming.use.isSafeToDistractPlayer = false;
 				GUILayout.Label("FRIENDS' SCORES");
 				GUILayout.Space(10);
 
@@ -540,6 +548,7 @@ public class Flashy : MonoBehaviour {
 			break;
 		
 			case MenuScreenMode.CREDITS:
+				giftgaming.use.isSafeToDistractPlayer = false;
 				if(GUILayout.Button("BACK")) {
 					menuScreenMode = MenuScreenMode.MAIN_MENU;
 				}
@@ -582,6 +591,7 @@ public class Flashy : MonoBehaviour {
 			break;
 		
 			case MenuScreenMode.HEALTH_WARNING:
+				giftgaming.use.isSafeToDistractPlayer = true;
 				GUILayout.BeginArea(ENTIRE_SCREEN);
 				GUILayout.Label("HEALTH WARNING\n\nTHIS GAME CONTAINS FLASHING LIGHTS WHICH MAY INDUCE EPILEPTIC SEIZURES.\n\nTHIS GAME IS NOT SUITABLE FOR ASTRAPHOBICS.");
 
@@ -598,6 +608,7 @@ public class Flashy : MonoBehaviour {
 			break;
 
 			case MenuScreenMode.HOW_TO_PLAY:
+				giftgaming.use.isSafeToDistractPlayer = true;
 				GUILayout.BeginArea(ENTIRE_SCREEN);
 					GUILayout.Label("HOW TO PLAY\nTouch the screen when it flashes white.\n\nUmbrellas allow you to make a mistake.\n\nThis is a hard game. Training is recommended.");
 						if(GUILayout.Button("OK")) {
@@ -607,7 +618,7 @@ public class Flashy : MonoBehaviour {
 			break;
 
 			case MenuScreenMode.MAIN_MENU:
-
+					giftgaming.use.isSafeToDistractPlayer = true;
 					GUILayout.BeginArea(CENTER_SCREEN);
 						
 						
@@ -684,6 +695,8 @@ public class Flashy : MonoBehaviour {
 
 			
 		if(menuScreenMode == MenuScreenMode.GAME) {
+			giftgaming.use.isSafeToDistractPlayer = gameOver;
+
 			GUI.Label(TOP_LEFT_SCREEN, counterDisplay);
 			GUI.Label(TOP_RIGHT_SCREEN, umbrellaDisplay);
 
@@ -864,10 +877,12 @@ public class Flashy : MonoBehaviour {
 		Handheld.StopActivityIndicator();
 
 		switch(productID) {
+			case "1_UMBRELLA":
+				incUmbrellaCount(1);
+			break;
+
 			case "3_UMBRELLAS":
-				player.umbrellaCount+= 3;
-				umbrellaDisplay.text = ""+player.umbrellaCount;
-				savePlayer();
+				incUmbrellaCount(3);
 			break;
 
 			case "CARRY_ON":
@@ -888,6 +903,12 @@ public class Flashy : MonoBehaviour {
 		}
 	}
 
+	void incUmbrellaCount(int umbrellas) {
+		player.umbrellaCount+= umbrellas;
+		umbrellaDisplay.text = ""+player.umbrellaCount;
+		savePlayer();
+	}
+	
 	public void cancelIAP(string reason) {
 		Handheld.StopActivityIndicator();
 	}
