@@ -839,12 +839,12 @@ public class giftgaming : MonoBehaviour {
 		GUI.skin = gameSkin;
 		GUILayout.BeginVertical("GiftWindow", GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
 			
-			GUILayout.Label("Help giftgaming give better coupons");
+			GUILayout.Label("Help giftgaming give better coupons", GUILayout.Height(100));
 
-			GUILayout.Label("Gender");
+			GUILayout.Label("Gender", GUILayout.Height(100));
 			genderIndex = GUILayout.SelectionGrid(genderIndex, genders, 2);
 		
-			GUILayout.Label("Age Range");
+			GUILayout.Label("Age Range",GUILayout.Height(100));
 			ageRangeIndex = GUILayout.SelectionGrid(ageRangeIndex, ageRanges, 2);
 
 			if(GUILayout.Button("Save my preferences")) {
