@@ -11,7 +11,7 @@ public class giftgaming : MonoBehaviour {
 	public GUISkin skin;
 	public GUISkin gameSkin;
 
-	public int GAME_ID = 3;
+	public int API_KEY = 3;
 
 	// How often to check for gifts
 	public int CHECK_FOR_GIFT_INTERVAL = 2;
@@ -180,7 +180,7 @@ public class giftgaming : MonoBehaviour {
 		 * --data '{"appId" : "dev-app-id", "requestId" : "2", "deviceId" : "cookie", "targeting" : {"gender" : "female", "age" : 24}}'
 		 */
 
-		string createggPlayerJSON = "{\"action\":\"newPlayerID\", \"gameID\":\""+GAME_ID+"\"}";
+		string createggPlayerJSON = "{\"action\":\"newPlayerID\", \"gameID\":\""+API_KEY+"\"}";
 		Debug.Log("Create player JSON: " + createggPlayerJSON);
 
 		WWW postJsonResponse = postJson(createggPlayerJSON);
