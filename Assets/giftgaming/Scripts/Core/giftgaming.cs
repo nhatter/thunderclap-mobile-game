@@ -19,19 +19,14 @@ public class giftgaming : MonoBehaviour {
 	public static giftgaming use;
 	public string host = "";
 	public string GIFTS_URL;
-	public bool IS_DEBUG_MODE = true;
 	public bool isCouponReminderSet = true;
 	public bool isShowingNotInterested = false;
-
-	public float giftTagRotation = 10.0f;
-	public Vector2 giftTagRotationPivot = new Vector2(Screen.width, Screen.height);
 	
 	string PLAYER_XML_FILE;
 	string DATA_PATH;
 	string COUPON_CACHE_FILE;
 
 	public Texture2D giftIcon;
-	public Texture2D foursquareLogo;
 	GUIContent giftButton = new GUIContent();
 
 	Dictionary<string, Gift> giftLookup = new Dictionary<string, Gift>();
