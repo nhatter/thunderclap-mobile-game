@@ -256,7 +256,10 @@ public class giftgaming : MonoBehaviour {
 
 		requestGift();
 
-		WWW postJsonResponse = postJson("{\"action\":\"requestGift\", \"playerID\":\""+playerID+"\"}");
+		string requestGiftJson = "{\"action\":\"requestGift\", \"playerID\":\""+playerID+"\"}";
+		Debug.Log(requestGiftJson);
+
+		WWW postJsonResponse = postJson(requestGiftJson);
 		yield return postJsonResponse; // wait til download done
 
 		if (postJsonResponse.error != null) {
@@ -276,9 +279,7 @@ public class giftgaming : MonoBehaviour {
 					logoCache.TryGetValue(giftResponse["creative"]["logoURL"], out brandLogo);
 					logoCache.TryGetValue(giftResponse["creative"]["coupon"]["logo"], out couponLogo);
 					Debug.Log("coupon logo :" +giftResponse["creative"]["coupon"]["logo"]);
-					string messageToPlayer = giftResponse["creative"]["messageToPlayer"];
-					messageToPlayer = messageToPlayer.Replace("\u005cr\u005cn", "\n");
-					Gift newGift = new Gift(giftResponse["giftCode"], giftResponse["giftKey"], brandLogo, messageToPlayer, couponLogo);
+					Gift newGift = new Gift(giftResponse["giftCode"], giftResponse["giftKey"], brandLogo, couponLogo);
 					giftQueue.Enqueue(newGift);
 					giftLookup.Add(giftResponse["giftKey"], newGift);
 				}
@@ -587,19 +588,7 @@ public class giftgaming : MonoBehaviour {
 			currentGift = giftQueue.Dequeue();
 		}
 	}
-
-	public bool hasGiftMessage() {
-		if(currentGift != null) {
-			return currentGift.messageToPlayer != null;
-		} else {
-			return false;
-		}
-	}
-
-	public string getGiftMessage() {
-		return currentGift.messageToPlayer;
-	}
-
+	
 	public string getGiftCouponSummary() {
 		return currentGift.couponURL;
 	}

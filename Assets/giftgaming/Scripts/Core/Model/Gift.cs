@@ -6,7 +6,6 @@ public class Gift {
 	public string giftKey;
 	public Texture2D brandLogo;
 	public Texture2D couponLogo;
-	public string messageToPlayer;
 	public string couponURL;
 
 	public bool isGiftOpened = false;
@@ -23,12 +22,11 @@ public class Gift {
 	public float giftCloseTime = 0;
 	public float redeemCouponTime = 0;
 
-	public Gift(string giftCode, string giftKey, Texture2D brandLogo, string messageToPlayer, Texture2D couponLogo) {
+	public Gift(string giftCode, string giftKey, Texture2D brandLogo, Texture2D couponLogo) {
 		this.giftCode = giftCode;
 		this.giftKey = giftKey;
 		this.brandLogo = brandLogo;
 		this.couponLogo = couponLogo;
-		this.messageToPlayer = messageToPlayer;
 		giftReceiveTimeStamp = Time.time;
 	}
 
