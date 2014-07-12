@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class giftgaming : MonoBehaviour {
 	// Assigned from giftgaming.com
 	// Make sure you set this to the correct ID
-	public GUISkin skin;
+	public GUISkin giftgamingSkin;
 	public GUISkin gameSkin;
 
 	public string API_KEY = "(From Manage Games on dashboard.giftgaming.com)";
@@ -18,7 +18,7 @@ public class giftgaming : MonoBehaviour {
 
 	public static giftgaming use;
 	public string host = "";
-	public string GIFTS_URL;
+	string GIFTS_URL;
 	public bool isCouponReminderSet = true;
 	public bool isShowingNotInterested = false;
 	
@@ -91,7 +91,7 @@ public class giftgaming : MonoBehaviour {
 
 		tex.SetPixels(colors);
 		tex.Apply();
-		listStyle.font = skin.window.font;
+		listStyle.font = giftgamingSkin.window.font;
 		listStyle.hover.background = tex;
 		listStyle.onHover.background = tex;
 		listStyle.padding.left = listStyle.padding.right = listStyle.padding.top = listStyle.padding.bottom = 4;
@@ -135,7 +135,7 @@ public class giftgaming : MonoBehaviour {
 
 		giftButton.image = giftIcon;
 
-		GUIStyle giftButtonStyle = skin.GetStyle("giftButton");
+		GUIStyle giftButtonStyle = giftgamingSkin.GetStyle("giftButton");
 		
 		BOTTOM_RIGHT = new Rect(Screen.width - giftButtonStyle.fixedWidth, Screen.height - giftButtonStyle.fixedHeight, giftButtonStyle.fixedWidth, giftButtonStyle.fixedHeight);
 
@@ -154,13 +154,13 @@ public class giftgaming : MonoBehaviour {
 	public void setInGameGift(GameObject inGameGift) {
 		this.inGameGift = inGameGift;
 		inGameGiftLogo = (Texture2D) inGameGift.GetComponentInChildren<Renderer>().material.GetTexture(0);
-		GUIStyle giftContentsStyle = skin.GetStyle("GiftContents");
+		GUIStyle giftContentsStyle = giftgamingSkin.GetStyle("GiftContents");
 		wrappedGiftRect = new Rect(Screen.width/2 - giftContentsStyle.fixedWidth/2, 150 + Screen.height/2 - giftContentsStyle.fixedHeight/2, giftContentsStyle.fixedWidth, giftContentsStyle.fixedHeight);
 	}
 
 	public void setInGameGiftLogo(Texture2D inGameGiftTexture) {
 		inGameGiftLogo = inGameGiftTexture;
-		GUIStyle giftContentsStyle = skin.GetStyle("GiftContents");
+		GUIStyle giftContentsStyle = giftgamingSkin.GetStyle("GiftContents");
 		wrappedGiftRect = new Rect(Screen.width/2 - giftContentsStyle.fixedWidth/2, 150 + Screen.height/2 - giftContentsStyle.fixedHeight/2, giftContentsStyle.fixedWidth, giftContentsStyle.fixedHeight);
 
 	}
@@ -677,7 +677,7 @@ public class giftgaming : MonoBehaviour {
 				
 				GUILayout.Space(5);
 			
-				GUILayout.BeginHorizontal(GUILayout.Height(skin.GetStyle("AddToPassbook").fixedHeight));
+				GUILayout.BeginHorizontal(GUILayout.Height(giftgamingSkin.GetStyle("AddToPassbook").fixedHeight));
 					GUI.skin = gameSkin;
 					#if UNITY_IPHONE
 						if(GUILayout.Button("Save to Passbook")) {
@@ -702,7 +702,7 @@ public class giftgaming : MonoBehaviour {
 							closeGift();
 						}
 					}
-					GUI.skin = skin;
+					GUI.skin = giftgamingSkin;
 		
 				GUILayout.EndHorizontal();
 
@@ -719,11 +719,6 @@ public class giftgaming : MonoBehaviour {
 
 
 			GUILayout.EndVertical();
-
-			//if ( Popup.List (new Rect(375, 620+254, 225, skin.GetStyle("Button").fixedHeight), 
-			//                 ref showList, ref selectedStoreChainIndex, new GUIContent(storeChainList[selectedStoreChainIndex]), storeChainList, "StoreSelect", "Window", listStyle)) {
-			//		picked = true;
-			//}
 		}
 	}
 
@@ -737,7 +732,7 @@ public class giftgaming : MonoBehaviour {
 			if(GUILayout.Button("Close Window")) {
 				hideCoupons();
 			}
-			GUI.skin = skin;
+			GUI.skin = giftgamingSkin;
 			
 			couponScrollPosition = GUILayout.BeginScrollView(couponScrollPosition, GUILayout.Width (Screen.width));
 				GUILayout.BeginVertical();
@@ -778,7 +773,7 @@ public class giftgaming : MonoBehaviour {
 					if(GUILayout.Button("Close Coupon")) {
 						openedCoupon = null;
 					}
-					GUI.skin = skin;
+					GUI.skin = giftgamingSkin;
 					
 				GUILayout.EndArea();
 
@@ -803,7 +798,7 @@ public class giftgaming : MonoBehaviour {
 						if(GUILayout.Button("Close Terms")) {
 							isDisplayingCouponTerms = false;
 						}
-						GUI.skin = skin;
+						GUI.skin = giftgamingSkin;
 					GUILayout.EndArea();
 				}
 
@@ -838,7 +833,7 @@ public class giftgaming : MonoBehaviour {
 			}
 			
 		GUILayout.EndVertical();
-		GUI.skin = skin;
+		GUI.skin = giftgamingSkin;
 	}
 
 	void drawGeoConsent() {
@@ -855,7 +850,7 @@ public class giftgaming : MonoBehaviour {
 					if(GUILayout.Button("No")) {
 						giveGeoConsent(false);
 					}
-					GUI.skin = skin;
+					GUI.skin = giftgamingSkin;
 				GUILayout.EndHorizontal();
 			GUILayout.EndArea();
 		GUI.EndGroup();
@@ -874,7 +869,7 @@ public class giftgaming : MonoBehaviour {
 	}
 
 	public void OnGUI() {
-		GUI.skin = skin;
+		GUI.skin = giftgamingSkin;
 
 		if(isDisplayingGeoConsent) {
 			GUI.enabled = false;
