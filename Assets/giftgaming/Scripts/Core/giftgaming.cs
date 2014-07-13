@@ -11,13 +11,13 @@ public class giftgaming : MonoBehaviour {
 	public GUISkin giftgamingSkin;
 	public GUISkin gameSkin;
 
+	public string API_ENDPOINT = "";
 	public string API_KEY = "(From Manage Games on dashboard.giftgaming.com)";
 
 	// How often to check for gifts
 	public int CHECK_FOR_GIFT_INTERVAL = 2;
 
 	public static giftgaming use;
-	public string host = "";
 	string GIFTS_URL;
 	public bool isCouponReminderSet = true;
 	public bool isShowingNotInterested = false;
@@ -106,7 +106,7 @@ public class giftgaming : MonoBehaviour {
 
 		DontDestroyOnLoad(this);
 
-		GIFTS_URL = "http://"+host+":8080/api/ads";
+		GIFTS_URL = "http://"+API_ENDPOINT+":8080/api/ads";
 		setupDropdown();
 		setup();
 	}
@@ -725,6 +725,8 @@ public class giftgaming : MonoBehaviour {
 	Color originalGUIColor;
 	public void drawSavedCoupons() {
 		if(isViewingCoupons()) {
+			GUI.enabled = true;
+
 			GUI.Box(ENTIRE_SCREEN, "", "Overlay");
 
 			GUI.skin = gameSkin;
@@ -733,17 +735,22 @@ public class giftgaming : MonoBehaviour {
 				hideCoupons();
 			}
 			GUI.skin = giftgamingSkin;
-			
+
+			if(openedCoupon!=null) {
+				GUI.enabled = false;
+			}
+
 			couponScrollPosition = GUILayout.BeginScrollView(couponScrollPosition, GUILayout.Width (Screen.width));
 				GUILayout.BeginVertical();
 					
-
+					
 					displayCoupons();
 					
 				GUILayout.EndVertical();
 			GUILayout.EndScrollView();
 
 			if(openedCoupon != null) {
+				GUI.enabled = true;
 				originalGUIColor = GUI.color;
 
 				GUI.Box(ENTIRE_SCREEN, "", "Overlay");
@@ -761,7 +768,7 @@ public class giftgaming : MonoBehaviour {
 					GUILayout.Box(openedCoupon.logo);
 					GUILayout.Space(10);
 
-					
+					GUI.enabled = true;
 					if(GUILayout.Button("Use Coupon Online")) {
 						Application.OpenURL(openedCoupon.storeLink);
 					}
@@ -772,6 +779,7 @@ public class giftgaming : MonoBehaviour {
 
 					if(GUILayout.Button("Close Coupon")) {
 						openedCoupon = null;
+						Debug.Log("Close coupon");
 					}
 					GUI.skin = giftgamingSkin;
 					
@@ -795,6 +803,7 @@ public class giftgaming : MonoBehaviour {
 						GUILayout.EndScrollView();
 
 						GUI.skin = gameSkin;
+						GUI.color = originalGUIColor;
 						if(GUILayout.Button("Close Terms")) {
 							isDisplayingCouponTerms = false;
 						}
@@ -804,7 +813,10 @@ public class giftgaming : MonoBehaviour {
 
 				GUI.color = originalGUIColor;
 			}
-		}
+
+
+
+		}// End of check for if viewing coupons
 	}
 
 	int genderIndex = 0;
@@ -868,6 +880,19 @@ public class giftgaming : MonoBehaviour {
 		Debug.Log("Test");
 	}
 
+	public void reviewCouponsButton() {
+		if(GUILayout.Button("giftgaming® Coupons")) {
+			requestCoupons();
+		}
+	}
+
+	public void prepareOverlay() {
+		if(giftgaming.use.isViewingCoupons()) {
+			// Disable other game GUI components
+			GUI.enabled = false;
+		}
+	}
+
 	public void OnGUI() {
 		GUI.skin = giftgamingSkin;
 
@@ -877,7 +902,7 @@ public class giftgaming : MonoBehaviour {
 			GUI.enabled = true;
 		}
 
-		GIFTS_URL = "http://"+host+":8080/api/ads";
+		GIFTS_URL = "http://"+API_ENDPOINT+":8080/api/ads";
 
 		if(isSafeToDistractPlayer) {
 			drawGiftButton();
@@ -893,10 +918,5 @@ public class giftgaming : MonoBehaviour {
 			GUI.enabled = true;
 			drawGeoConsent();
 		}
-
-		drawSavedCoupons();
-
-
-
 	}
 }

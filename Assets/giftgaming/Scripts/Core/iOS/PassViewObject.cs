@@ -26,7 +26,7 @@ public class PassViewObject : MonoBehaviour {
 	public bool IsKeyboardVisible {
 		get {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-				return mPassViewPlugin;
+				return false;
 			#else
 				return TouchScreenKeyboard.visible;
 			#endif

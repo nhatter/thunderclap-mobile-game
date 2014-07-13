@@ -439,6 +439,9 @@ public class Flashy : MonoBehaviour {
 			return;
 		}
 
+		giftgaming.use.prepareOverlay();
+
+
 		switch(menuScreenMode) {
 			case MenuScreenMode.LEVEL_SELECT:
 				giftgaming.use.isSafeToDistractPlayer = false;
@@ -641,16 +644,22 @@ public class Flashy : MonoBehaviour {
 							Handheld.StopActivityIndicator();
 						}
 
+
+					
+						giftgaming.use.reviewCouponsButton();
+
+
 						if(FB.IsLoggedIn) {
 							GUI.enabled = false;
 						}		
 
+						giftgaming.use.prepareOverlay();
 						if(GUILayout.Button(fbConnectButton)) {							
 							fb.CallFBLogin();
 						}
 
 						GUI.enabled = true;
-
+						giftgaming.use.prepareOverlay();
 						if(GUILayout.Button(fbLikeButton)) {
 							Application.OpenURL("https://www.facebook.com/thundrclap");
 						}
@@ -681,10 +690,14 @@ public class Flashy : MonoBehaviour {
 						}
 						#endif
 
+
+
 						if(GUILayout.Button("CREDITS")) {
 							menuScreenMode = MenuScreenMode.CREDITS;
 							Handheld.StopActivityIndicator();
 						}
+
+
 						GUILayout.EndVertical();
 
 					
@@ -860,8 +873,13 @@ public class Flashy : MonoBehaviour {
 			
 			GUI.enabled = false;
 		}
-		
+
+		GUI.skin = giftgaming.use.giftgamingSkin;
+		GUI.enabled = true;
+		giftgaming.use.drawSavedCoupons();
+
 		GUI.skin = skin;
+
 
 	}
 
