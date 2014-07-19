@@ -71,6 +71,9 @@ public class giftgaming : MonoBehaviour {
 
 	public bool isSafeToDistractPlayer = false;
 
+	string passbookButtonText = "Save to Passbook";
+	bool isSavingCoupon = false;
+
 	void setupDropdown() {
 		// Make some content for the popup list
 		storeChainList = new GUIContent[5];
@@ -326,7 +329,9 @@ public class giftgaming : MonoBehaviour {
 						File.WriteAllBytes(COUPON_CACHE_FILE, downloadCoupon.bytes);
 
 						Handheld.StopActivityIndicator();
-
+						isSavingCoupon = false;
+						passbookButtonText = "Save to Passbook";
+						
 						currentGift.isCouponRedeemed = true;
 
 						#if UNITY_IPHONE && !UNITY_EDITOR
@@ -338,6 +343,7 @@ public class giftgaming : MonoBehaviour {
 
 					case "GIFT_CLOSED":
 						Debug.Log("Gift closed successfully");
+						isSavingCoupon = false;
 					break;
 
 					case "PREFERENCES_SAVED":
@@ -514,6 +520,9 @@ public class giftgaming : MonoBehaviour {
 	public void redeemCoupon() {
 		if(currentGift != null) {
 			if(currentGift.isGiftOpened) {
+				isSavingCoupon = true;
+				passbookButtonText = "Downloading...";
+
 				currentGift.isCouponRedeemed = true;
 				currentGift.redeemCouponTime = Time.time - currentGift.giftReceiveTimeStamp;
 
@@ -680,13 +689,19 @@ public class giftgaming : MonoBehaviour {
 				GUILayout.BeginHorizontal(GUILayout.Height(giftgamingSkin.GetStyle("AddToPassbook").fixedHeight));
 					GUI.skin = gameSkin;
 					#if UNITY_IPHONE
-						if(GUILayout.Button("Save to Passbook")) {
+						if(isSavingCoupon) {
+							GUI.enabled = false;
+						}
+
+						if(GUILayout.Button(passbookButtonText)) {
 							if(!player.hasBeenOfferedGeoConsent) {
 								isDisplayingGeoConsent = true;
 							} else {
 								redeemCoupon();
 							}
 						}
+
+						GUI.enabled = true;
 					#else
 						if(GUILayout.Button("", "SaveCoupon")) {
 							redeemCoupon();
@@ -881,9 +896,11 @@ public class giftgaming : MonoBehaviour {
 	}
 
 	public void reviewCouponsButton() {
+		#if !UNITY_IPHONE
 		if(GUILayout.Button("giftgaming® Coupons")) {
 			requestCoupons();
 		}
+		#endif
 	}
 
 	public void prepareOverlay() {
