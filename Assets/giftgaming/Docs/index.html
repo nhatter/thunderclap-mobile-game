@@ -1,0 +1,114 @@
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body style="font-family: 'Open Sans', sans-serif;">
+<h1><img src="img/logo.png" style="width: 50%" /><br />Unity SDK Integration</h1>
+<h2>Forward</h2>
+<p>If you've ever used the iOS in-app purchase system and iTunes Connect (TM), you're in luck as our system works similar to that. Each gift has a code - this is sent from our server to your game to tell it what digital content to unlock. What action you take based on the code is entirely up to you. Perhaps you want to give some extra lives, or virtual currency, etc.</p>
+
+<p>The API is stateless and is HTTP-based. The giftgaming Unity SDK caches ad images, and does requests and downloads asynchronously.</p>
+
+<h2>1. Import the Unity SDK package into your game</h2>
+<p>Install the giftgaming Unity SDK then drag and drop the giftgaming prefab into the first scene of your game. This will persist throughout the life of the game.</p>
+
+<img src="img/drag_and_drop.png" alt="Drag and drop the giftgaming prefab into your first scene" style="width: 50%" />
+
+<h3>Tell giftgaming what skin your game uses</h3>
+<p>giftgaming tries to not be too intrusive and go for the "native experience". We want to help you preserve the look and feel of your game.</p>
+
+<p>On the giftgaming prefab, set Game Skin to be whatever GUI Skin your game uses generally.</p>
+
+<img src="img/set_game_skin.png" alt="Set the Game Skin attribute to be the GUI skin your game uses." style="width: 50%" />
+
+<h2>2. Get your API key</h2>
+<p>Go to the <a href="http://dashboard.giftgaming.com">giftgaming Dashboard</a> and login. Go to <a href="http://dashboard.giftgaming.com/manageGames">Manage Games</a>, add a new game. Afterwards, take the API Key given and put this into the API key field on the giftgaming prefab.</p>
+
+<h2>3. Setup some gifts</h2>
+<p>On the giftgaming Dashboard, go to Manage Gifts and create some gifts. Like you would in iTunes Connect (TM).</p>
+
+<img src="img/manage_gifts.png" alt="Specify what gifts can be given on the giftgaming Dashboard" style="width: 50%" />
+
+<h2>4. Decide how each gift should be applied</h2>
+<p>Open <code>giftgamingGifts.cs</code> in Unity and in the <code>openNextGift()</code> function, decide what to do with the gift code. For example, if you got a code of <code>EXTRA_LIFE</code>, then you'd want to do <code>lives++</code>, etc. You could write a switch-case, or even better, just reuse your existing in-app purchase manager code!</p>
+
+<p><strong>Example of delegating to an existing IAP manager:</strong></p>
+<pre>
+public static void openNextGift() {
+		giftgaming.use.nextGift();
+		giftgaming.use.openGift();
+
+		// Implement your own custom actions here for gift codes
+		Flashy.use.unlockIAP(giftgaming.use.currentGift.giftCode);
+		
+		// Use the umbrella icon for all gifts (or whatever)
+		giftgaming.use.setInGameGiftLogo(Flashy.use.umbrellaIcon);
+}
+</pre>
+
+<p><strong>Set an in-game gift logo</strong></p>
+<p>Note the <code>setInGameGiftLogo</code> function - ideally you might want to use this function in your IAP manager code, or switch case statement. This tells the giftgaming module what icon to use when a gift is opened. For example, if it was an extra life, perhaps this icon would be of a first-aid kit.</p>
+
+<h2>5. Whitelist some brands</h2>
+<p>giftgaming uses a "marriage" system. Brands pick games, and game publishers pick brands. We do this to prevent inappropriate advertising on both sides.</p>
+
+<img src="img/brand_game_match.png" alt="Set the Game Skin attribute to be the GUI skin your game uses." style="width: 50%" />
+
+<p>Go to <a href="http://dashboard.giftgaming.com/selectBrands">Select Brands</a> on the giftgaming Dashboard, then for each of your games, select the brands you think would be appropriate.</p>
+
+<p>The brand must also select your game too for there to be a match. Please make sure you're right about the demographic and age rating! Both the advertiser and you, the game publisher, have a responsibility to reduce any possibility of inappropriate advertising.</p>
+
+<p>If in doubt, refer to Google Play or Apple App Store content and age rating guidelines.</p>
+
+<p><strong>Now you should be able to see gifts coming in your game!</strong> To aid debugging, use the <a href="http://dashboard.giftgaming.com/liveDeliveries">LIVE Gift Deliveries</a> interface on the giftgaming Dashboard.</p>
+
+<h2>6. Enable a virtual wallet for coupon saving</h2>
+<h3>6a. Enable Passbook Capability in Xcode for iPhone builds</h3>
+<p>OK so Passbook is pretty damn awesome. It allows players to save coupons in-game quickly as well as provide non-intrusive location-based reminders. When you build for iPhone, please do enable Passbook Capability.</p>
+
+<img src="img/enable_passbook.png" alt="Enable the Passbook capability in Xcode" style="width: 50%" />
+
+<h3>6b. Enable in-game virtual wallet for all non-iPhone builds</h3>
+<p>giftgaming allows players to store coupons in your game. This not only makes it convenient to save coupons, it hopefully keeps them coming back to your game!</p>
+
+<h4>Add a coupons button to your game menu</h4>
+<p>All you have to do is stick this line of code in your game menu:</p>
+<pre>
+giftgaming.use.reviewCouponsButton();
+</pre>
+
+<p>This creates a button which says "giftgaming Coupons"</p>
+
+<h4>Display coupons</h4>
+<p>Then stick this snippet into your menu OnGUI loop:</p>
+<pre>
+	GUI.skin = giftgaming.use.giftgamingSkin;
+	GUI.enabled = true;
+	giftgaming.use.drawSavedCoupons();
+
+	GUI.skin = skin;
+</pre>
+
+<p>When the user clicks the "giftgaming Coupons" button, this will show a list of coupons they can use, and so forth.</p>
+
+<h2>7. Start making money</h2>
+<p>Go to the giftgaming Dashboard and <a href="http://dashboard.giftgaming.com/reports">view your earning reports</a>. Let the money flow! Please see our full terms and conditions regarding payments.</p>
+
+<h2>Other Things</h2>
+<h3>Modify Gift Icon and Gift Contents container in "Textures" folder</h3>
+<p>Feel free to modify this so it looks and feels as part of your game.</p>
+
+<h3>Use our white or coloured logo</h3>
+<p>Whichever is more visible. Please do not use any other logos, or modify our logo! Thanks.</p>
+
+<h3>Do not modify Coupon Geo Consent logo</h3>
+<p>We'd prefer if you didn't!</p>
+
+<h3>Change gift checking frequency</h3>
+<p>Specify how many seconds you want to check between each pull. Note: We went for a pull architecture rather than push for now as we felt it would allow for more control over HTTP request handling. However, we may opt for push in the near future.</P>
+
+<h3>Decide when it is safe to display the gift icon</h3>
+<p>Use <code>giftgaming.use.isSafeToDistractPlayer = false;</code> if you want to disable the gift icon appearing during for example, surgeon-level precision tasks, etc.</p>
+
+</body>
+</html>
