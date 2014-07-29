@@ -683,9 +683,7 @@ public class giftgaming : MonoBehaviour {
 					drawBrandLogo();
 				GUILayout.EndHorizontal();
 
-				//GUI.skin = gameSkin;
 				GUILayout.Label ("HAS GIVEN YOU A GIFT!");
-				//GUI.skin = skin;
 
 				GUILayout.Space(4);
 				drawGiftLogo();
