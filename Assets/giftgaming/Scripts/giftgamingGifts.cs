@@ -19,6 +19,8 @@ public class giftgamingGifts : MonoBehaviour {
 		 * giftgaming.use.setInGameGiftLogo(Flashy.use.umbrellaIcon);
 		 * 
 		 */
+
+		 Flashy.use.unlockIAP(giftgaming.use.currentGift.giftCode);
 	}
 
 	/* Description functions:
