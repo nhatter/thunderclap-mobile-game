@@ -897,6 +897,7 @@ public class Flashy : MonoBehaviour {
 		switch(productID) {
 			case "1_UMBRELLA":
 				incUmbrellaCount(1);
+				giftgaming.use.setInGameGiftLogo(umbrellaIcon);
 			break;
 
 			case "3_UMBRELLAS":
