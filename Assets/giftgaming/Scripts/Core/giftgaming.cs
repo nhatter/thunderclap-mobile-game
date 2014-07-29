@@ -46,6 +46,7 @@ public class giftgaming : MonoBehaviour {
 	List<Sponsor> topSponsors = new List<Sponsor>();
 
 	Rect BOTTOM_RIGHT;
+	Rect TOP_RIGHT;
 	Rect ENTIRE_SCREEN = new Rect(0, 0, Screen.width, Screen.height);
 	Rect COUPON_SCREEN = new Rect(0,150, Screen.width, Screen.height-150);
 	GameObject inGameGift;
@@ -141,9 +142,7 @@ public class giftgaming : MonoBehaviour {
 		GUIStyle giftButtonStyle = giftgamingSkin.GetStyle("giftButton");
 		
 		BOTTOM_RIGHT = new Rect(Screen.width - giftButtonStyle.fixedWidth, Screen.height - giftButtonStyle.fixedHeight, giftButtonStyle.fixedWidth, giftButtonStyle.fixedHeight);
-
-
-		Screen.orientation = ScreenOrientation.Portrait;
+		TOP_RIGHT = new Rect(Screen.width - giftButtonStyle.fixedWidth, 0, giftButtonStyle.fixedWidth, giftButtonStyle.fixedHeight);
 
 		couponGeoReminder.text = "            Remind me to use it near: ";
 		couponGeoReminder.image = couponGeoReminderImage;
@@ -322,7 +321,11 @@ public class giftgaming : MonoBehaviour {
 						currentGift.couponURL = giftResponse["couponURL"];
 
 						Handheld.StartActivityIndicator();
-						WWW downloadCoupon = new WWW (currentGift.couponURL);
+
+						WWWForm form = new WWWForm();
+						form.headers.Add("Authorization", getBasicAuthString());
+
+						WWW downloadCoupon = new WWW (currentGift.couponURL, form);
 						yield return downloadCoupon;
 
 						// Cache coupon incase needs to be used again
@@ -443,6 +446,11 @@ public class giftgaming : MonoBehaviour {
 
 			}
 		}
+	}
+
+	// Please do not share this with anyone without our permission -thanks
+	public string getBasicAuthString() {
+		return "Basic dGVzdGVyOkdvb2RHYW1lQWxs";
 	}
 
 	Vector2 couponScrollPosition;
@@ -609,6 +617,8 @@ public class giftgaming : MonoBehaviour {
 	public WWW postJson(string json) {
 		Hashtable postHeader = new Hashtable();
 		postHeader.Add("Content-Type", "application/json");
+		postHeader.Add("Authorization", getBasicAuthString());
+
 		var encoding = new System.Text.UTF8Encoding();
 		WWW postJsonResponse = new WWW(GIFTS_URL, encoding.GetBytes(json), postHeader);
 		return postJsonResponse; // Wait until the download is done
