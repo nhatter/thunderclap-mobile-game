@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class Gift {
+	public string giftName;
 	public string giftCode;
 	public string giftKey;
 	public Texture2D brandLogo;
@@ -22,7 +23,8 @@ public class Gift {
 	public float giftCloseTime = 0;
 	public float redeemCouponTime = 0;
 
-	public Gift(string giftCode, string giftKey, Texture2D brandLogo, Texture2D couponLogo) {
+	public Gift(string giftName, string giftCode, string giftKey, Texture2D brandLogo, Texture2D couponLogo) {
+		this.giftName = giftName;
 		this.giftCode = giftCode;
 		this.giftKey = giftKey;
 		this.brandLogo = brandLogo;
@@ -34,7 +36,7 @@ public class Gift {
 		if(brandLogo != null) {
 			GUILayout.Box(brandLogo
 				#if UNITY_EDITOR
-			    	, GUILayout.Height(50)
+			    	//, GUILayout.Height(50)
 				#endif
 			);
 		}

@@ -281,7 +281,7 @@ public class giftgaming : MonoBehaviour {
 					logoCache.TryGetValue(giftResponse["creative"]["logoURL"], out brandLogo);
 					logoCache.TryGetValue(giftResponse["creative"]["coupon"]["logo"], out couponLogo);
 					Debug.Log("coupon logo :" +giftResponse["creative"]["coupon"]["logo"]);
-					Gift newGift = new Gift(giftResponse["giftCode"], giftResponse["giftKey"], brandLogo, couponLogo);
+					Gift newGift = new Gift(giftResponse["giftName"], giftResponse["giftCode"], giftResponse["giftKey"], brandLogo, couponLogo);
 					giftQueue.Enqueue(newGift);
 					giftLookup.Add(giftResponse["giftKey"], newGift);
 				}
@@ -322,10 +322,7 @@ public class giftgaming : MonoBehaviour {
 
 						Handheld.StartActivityIndicator();
 
-						WWWForm form = new WWWForm();
-						form.headers.Add("Authorization", getBasicAuthString());
-
-						WWW downloadCoupon = new WWW (currentGift.couponURL, form);
+						WWW downloadCoupon = new WWW (currentGift.couponURL);
 						yield return downloadCoupon;
 
 						// Cache coupon incase needs to be used again
@@ -647,7 +644,10 @@ public class giftgaming : MonoBehaviour {
 				GUILayout.BeginVertical();
 					GUILayout.BeginHorizontal();
 						GUILayout.Box(inGameGiftLogo, "GiftContents");
-						GUILayout.Label(" + a special discount");
+						GUILayout.BeginVertical();
+							GUILayout.Label(currentGift.giftName);
+							GUILayout.Label(" + a special discount");
+						GUILayout.EndVertical();
 					GUILayout.EndHorizontal();
 				GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
@@ -677,72 +677,125 @@ public class giftgaming : MonoBehaviour {
 
 	public void drawGift() {
 		if(isGiftOpened()) {
+			GUI.skin = giftgamingSkin;
 
 			GUILayout.BeginVertical("GiftWindow", GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
-				GUILayout.BeginHorizontal();
+
+				GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+					GUILayout.FlexibleSpace();
 					drawBrandLogo();
+					GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
 
-				GUILayout.Label ("HAS GIVEN YOU A GIFT!");
-
-				GUILayout.Space(4);
-				drawGiftLogo();
 				GUILayout.BeginHorizontal();
-				GUILayout.Space(5);
-				drawCouponLogo();
-				GUILayout.EndHorizontal();
-				
-				GUILayout.Space(5);
-			
-				GUILayout.BeginHorizontal(GUILayout.Height(giftgamingSkin.GetStyle("AddToPassbook").fixedHeight));
-					GUI.skin = gameSkin;
-					#if UNITY_IPHONE
-						if(isSavingCoupon) {
-							GUI.enabled = false;
-						}
-
-						if(GUILayout.Button(passbookButtonText)) {
-							if(!player.hasBeenOfferedGeoConsent) {
-								isDisplayingGeoConsent = true;
-							} else {
-								redeemCoupon();
-							}
-						}
-
-						GUI.enabled = true;
-					#else
-						if(GUILayout.Button("", "SaveCoupon")) {
-							redeemCoupon();
-							closeGift();
-						}
-					#endif
-
-					
-					if(GUILayout.Button("Close")) {
-						if(!player.hasGivenPreferences) {
-							isShowingNotInterested = true;
-						} else {
-							closeGift();
-						}
-					}
-					GUI.skin = giftgamingSkin;
-		
+					GUILayout.Label ("HAS GIVEN YOU A GIFT!", "giftAnnouncement");
 				GUILayout.EndHorizontal();
 
-				GUILayout.BeginVertical();
+				if(isScreenLandscape()) {
 					GUILayout.BeginHorizontal();
-						GUILayout.Label("DELIVERED BY ");
-						GUILayout.Label(giftgamingLogo, "Logo", GUILayout.Height(60));
-					GUILayout.EndHorizontal();
-					GUILayout.Space(5);
-					GUILayout.Label("giftgaming® privacy policy available at: www.giftgaming.com/privacy\n"
-			                	 +  "Location-based reminders powered by FOURSQUARE and APPLE, INC\n"
-								 +  "giftgaming Ltd is NOT AFFILIATED with FOURSQUARE or APPLE, INC", "SmallPrint");
-				GUILayout.EndVertical();
+						GUILayout.BeginVertical();
+							
+							GUILayout.Space(4);
+							drawGiftLogo();
+							drawSmallPrint();
+							drawGiftControls();
+						GUILayout.EndVertical();
 
+						drawCouponLogo();						
+					GUILayout.EndHorizontal();
+				} else {
+					GUILayout.Space(4);
+					drawGiftLogo();
+					
+					GUILayout.BeginHorizontal();
+						GUILayout.Space(5);
+						drawCouponLogo();
+					GUILayout.EndHorizontal();
+
+					GUILayout.Space(5);
+					drawGiftControls();
+					
+					drawSmallPrint();
+				}
 
 			GUILayout.EndVertical();
 		}
+	}
+
+	public void drawGiftControls() {
+
+		BeginVerticalIfLandscape();
+
+		GUI.skin = gameSkin;
+		#if UNITY_IPHONE
+		if(isSavingCoupon) {
+			GUI.enabled = false;
+		}
+		
+		if(GUILayout.Button(passbookButtonText)) {
+			if(!player.hasBeenOfferedGeoConsent) {
+				isDisplayingGeoConsent = true;
+			} else {
+				redeemCoupon();
+			}
+		}
+
+		GUI.enabled = true;
+		#else
+		if(GUILayout.Button("", "SaveCoupon")) {
+			redeemCoupon();
+			closeGift();
+		}
+		#endif
+		
+		
+		if(GUILayout.Button("Close")) {
+			if(!player.hasGivenPreferences) {
+				isShowingNotInterested = true;
+			} else {
+				closeGift();
+			}
+		}
+		GUI.skin = giftgamingSkin;
+
+		EndVerticalIfLandscape();
+	}
+
+	public bool isScreenLandscape() {
+		return Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeRight || true;
+	}
+
+	public void BeginVerticalIfLandscape() {
+		if(isScreenLandscape()) {
+			GUILayout.BeginVertical(GUILayout.Height(giftgamingSkin.GetStyle("AddToPassbook").fixedHeight));
+		} else {
+			GUILayout.BeginHorizontal(GUILayout.Height(giftgamingSkin.GetStyle("AddToPassbook").fixedHeight));
+		}
+	}
+
+	public void EndVerticalIfLandscape() {
+		if(isScreenLandscape()) {
+			GUILayout.EndVertical();
+		} else {
+			GUILayout.EndHorizontal();
+		}
+	}
+
+	public void drawSmallPrint() {
+			
+			GUILayout.BeginHorizontal();
+
+				GUILayout.Label("DELIVERED BY ", GUILayout.MinWidth(180));
+				GUILayout.Box(giftgamingLogo, "Logo", GUILayout.Height(60));
+				GUILayout.FlexibleSpace();
+				
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(5);
+
+			GUILayout.Label("giftgaming® privacy policy available at: www.giftgaming.com/privacy\n"
+			                +  "Location-based reminders powered by FOURSQUARE\n"
+			                +  "giftgaming Ltd is NOT AFFILIATED with FOURSQUARE", "SmallPrint");
 	}
 
 	Color originalGUIColor;
