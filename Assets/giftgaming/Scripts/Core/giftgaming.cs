@@ -633,7 +633,11 @@ public class giftgaming : MonoBehaviour {
 	public void drawBrandLogo() {
 		if(currentGift != null) {
 			if(currentGift.brandLogo != null) {
-				currentGift.drawBrandLogo();
+				if(isScreenLandscape()) {
+					currentGift.drawBrandLogo(Screen.width-currentGift.couponLogo.width);
+				} else {
+					currentGift.drawBrandLogo();
+				}
 			}
 		}
 	}
@@ -641,14 +645,10 @@ public class giftgaming : MonoBehaviour {
 	public void drawGiftLogo() {
 		if(inGameGiftLogo != null) {
 			GUILayout.BeginHorizontal();
+				GUILayout.Box(inGameGiftLogo, "GiftContents");
 				GUILayout.BeginVertical();
-					GUILayout.BeginHorizontal();
-						GUILayout.Box(inGameGiftLogo, "GiftContents");
-						GUILayout.BeginVertical();
-							GUILayout.Label(currentGift.giftName);
-							GUILayout.Label(" + a special discount");
-						GUILayout.EndVertical();
-					GUILayout.EndHorizontal();
+					GUILayout.Label(currentGift.giftName);
+					GUILayout.Label(" + a special discount");
 				GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
 		}
@@ -679,31 +679,52 @@ public class giftgaming : MonoBehaviour {
 		if(isGiftOpened()) {
 			GUI.skin = giftgamingSkin;
 
-			GUILayout.BeginVertical("GiftWindow", GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
-
-				GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
-					GUILayout.FlexibleSpace();
-					drawBrandLogo();
-					GUILayout.FlexibleSpace();
-				GUILayout.EndHorizontal();
-
-				GUILayout.BeginHorizontal();
-					GUILayout.Label ("HAS GIVEN YOU A GIFT!", "giftAnnouncement");
-				GUILayout.EndHorizontal();
+			GUILayout.BeginVertical(GUILayout.Width(Screen.width), GUILayout.Height(Screen.height));
 
 				if(isScreenLandscape()) {
-					GUILayout.BeginHorizontal();
-						GUILayout.BeginVertical();
-							
-							GUILayout.Space(4);
-							drawGiftLogo();
-							drawSmallPrint();
-							drawGiftControls();
-						GUILayout.EndVertical();
+					GUILayout.BeginVertical();
+						GUILayout.FlexibleSpace();
 
-						drawCouponLogo();						
-					GUILayout.EndHorizontal();
+						GUILayout.BeginHorizontal();
+							GUILayout.BeginVertical(GUILayout.Width(Screen.width-currentGift.couponLogo.width));
+								drawBrandLogo();
+								GUILayout.Label ("HAS GIVEN YOU A GIFT!", "giftAnnouncement");
+								GUILayout.Space(10);
+									GUILayout.BeginHorizontal();
+										GUILayout.FlexibleSpace();
+										drawGiftLogo();
+										GUILayout.FlexibleSpace();
+									GUILayout.EndHorizontal();
+								GUILayout.FlexibleSpace();
+							GUILayout.EndVertical();
+
+							drawCouponLogo();
+						GUILayout.EndHorizontal();
+
+						GUILayout.BeginHorizontal();
+							drawGiftControls();
+						GUILayout.EndHorizontal();
+
+						GUILayout.BeginHorizontal();
+							GUILayout.FlexibleSpace();
+								drawSmallPrint();
+							GUILayout.FlexibleSpace();
+						GUILayout.EndHorizontal();
+
+						GUILayout.FlexibleSpace();
+
+					GUILayout.EndVertical();
 				} else {
+					GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+						GUILayout.FlexibleSpace();
+							drawBrandLogo();
+						GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+
+					GUILayout.BeginHorizontal();
+						GUILayout.Label ("HAS GIVEN YOU A GIFT!", "giftAnnouncement");
+					GUILayout.EndHorizontal();
+
 					GUILayout.Space(4);
 					drawGiftLogo();
 					
@@ -724,41 +745,46 @@ public class giftgaming : MonoBehaviour {
 
 	public void drawGiftControls() {
 
-		BeginVerticalIfLandscape();
-
 		GUI.skin = gameSkin;
-		#if UNITY_IPHONE
-		if(isSavingCoupon) {
-			GUI.enabled = false;
-		}
-		
-		if(GUILayout.Button(passbookButtonText)) {
-			if(!player.hasBeenOfferedGeoConsent) {
-				isDisplayingGeoConsent = true;
-			} else {
-				redeemCoupon();
-			}
-		}
+			GUILayout.BeginHorizontal();
+				drawCloseGiftButton();
+				drawSaveCouponButton();	
+			GUILayout.EndHorizontal();
+		GUI.skin = giftgamingSkin;
 
-		GUI.enabled = true;
-		#else
-		if(GUILayout.Button("", "SaveCoupon")) {
-			redeemCoupon();
-			closeGift();
-		}
-		#endif
-		
-		
-		if(GUILayout.Button("Close")) {
+	}
+
+	public void drawCloseGiftButton() {
+		if(GUILayout.Button("Close", GUILayout.Width(Screen.width-currentGift.couponLogo.width))) {
 			if(!player.hasGivenPreferences) {
 				isShowingNotInterested = true;
 			} else {
 				closeGift();
 			}
 		}
-		GUI.skin = giftgamingSkin;
+	}
 
-		EndVerticalIfLandscape();
+	public void drawSaveCouponButton() {
+		#if UNITY_IPHONE
+			if(isSavingCoupon) {
+				GUI.enabled = false;
+			}
+			
+			if(GUILayout.Button(passbookButtonText, GUILayout.Width(currentGift.couponLogo.width) )) {
+				if(!player.hasBeenOfferedGeoConsent) {
+					isDisplayingGeoConsent = true;
+				} else {
+					redeemCoupon();
+				}
+			}
+			
+		GUI.enabled = true;
+		#else
+			if(GUILayout.Button("", "SaveCoupon")) {
+				redeemCoupon();
+				closeGift();
+			}
+		#endif
 	}
 
 	public bool isScreenLandscape() {
@@ -782,20 +808,22 @@ public class giftgaming : MonoBehaviour {
 	}
 
 	public void drawSmallPrint() {
-			
+		GUILayout.BeginVertical();
 			GUILayout.BeginHorizontal();
-
+				GUILayout.FlexibleSpace();
 				GUILayout.Label("DELIVERED BY ", GUILayout.MinWidth(180));
 				GUILayout.Box(giftgamingLogo, "Logo", GUILayout.Height(60));
 				GUILayout.FlexibleSpace();
-				
 			GUILayout.EndHorizontal();
 
-			GUILayout.Space(5);
-
-			GUILayout.Label("giftgaming® privacy policy available at: www.giftgaming.com/privacy\n"
-			                +  "Location-based reminders powered by FOURSQUARE\n"
-			                +  "giftgaming Ltd is NOT AFFILIATED with FOURSQUARE", "SmallPrint");
+			//GUILayout.Space(5);
+			GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.Label("giftgaming® privacy policy available at: www.giftgaming.com/privacy\n"
+		             	      + "Location-based reminders powered by FOURSQUARE\n", "SmallPrint");
+				GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+		GUILayout.EndVertical();
 	}
 
 	Color originalGUIColor;

@@ -34,7 +34,13 @@ public class Gift {
 
 	public void drawBrandLogo() {
 		if(brandLogo != null) {
-			GUILayout.Box(brandLogo
+			drawBrandLogo(brandLogo.width);
+		}
+	}
+
+	public void drawBrandLogo(int maxWidth) {
+		if(brandLogo != null) {
+			GUILayout.Box(brandLogo, GUILayout.MaxWidth(maxWidth)
 				#if UNITY_EDITOR
 			    	//, GUILayout.Height(50)
 				#endif
@@ -44,9 +50,15 @@ public class Gift {
 
 	public void drawCouponLogo() {
 		if(couponLogo != null) {
-			GUILayout.Box(couponLogo
+			drawCouponLogo(couponLogo.width);
+		}
+	}
+
+	public void drawCouponLogo(int maxWidth) {
+		if(couponLogo != null) {
+			GUILayout.Box(couponLogo, GUILayout.MaxWidth(maxWidth)
 	              #if UNITY_EDITOR
-	             	 , GUILayout.Height(100)
+	             	// , GUILayout.Height(100)
 	              #endif
 			);
 		}
